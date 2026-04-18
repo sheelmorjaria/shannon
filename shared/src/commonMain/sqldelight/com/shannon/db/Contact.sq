@@ -1,0 +1,20 @@
+CREATE TABLE contact (
+    destination_hash TEXT NOT NULL PRIMARY KEY,
+    display_name TEXT NOT NULL DEFAULT '',
+    public_key BLOB
+);
+
+selectAll:
+SELECT * FROM contact
+ORDER BY display_name;
+
+selectByHash:
+SELECT * FROM contact
+WHERE destination_hash = ?;
+
+insert:
+INSERT OR REPLACE INTO contact(destination_hash, display_name, public_key)
+VALUES (?, ?, ?);
+
+deleteByHash:
+DELETE FROM contact WHERE destination_hash = ?;

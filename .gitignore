@@ -1,0 +1,115 @@
+# Gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/gradle-wrapper.jar
+
+# Kotlin
+*.kt~
+*.kts~
+*.class
+*.jar
+*.war
+*.nar
+
+# Android
+*.apk
+*.ap_
+*.aab
+*.dex
+*.dex.java
+*.iml
+.idea/
+.DS_Store
+/build/
+captures/
+.externalNativeBuild
+.cxx/
+local.properties
+
+# Android Studio generated files
+*.iml
+.idea/
+.DS_Store
+/captures
+.externalNativeBuild
+.cxx
+
+# Kotlin
+*.kt~
+*.kts~
+*.class
+*.jar
+
+# Compose
+.compose/
+
+# SQLDelight
+*.db
+*.db-shm
+*.db-wal
+
+# Reticulum
+.reticulum/
+reticulum/
+*.reticulum
+
+# Identity and Keys (CRITICAL - never commit private keys!)
+identities/
+identity/
+*.pem
+*.key
+*.crt
+keystore/
+*.keystore
+*.jks
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Build outputs
+build/
+out/
+target/
+
+# Test results
+test-results/
+*.test
+
+# Coverage
+*.exec
+jacoco/
+coverage/
+
+# Temporary files
+*.tmp
+*.temp
+*.cache
+.cache/
+
+# ProGuard
+proguard/
+*.map
+
+# Reticulum config (may contain sensitive info)
+.reticulum.yaml
+
+# Database files (development only)
+*.db
+*.db-shm
+*.db-wal
+
+# Exported health metrics
+service_health_metrics_*.txt

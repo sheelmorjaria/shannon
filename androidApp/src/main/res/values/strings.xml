@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Shannon</string>
+    <string name="network_service_name">Shannon Network Service</string>
+    <string name="network_service_description">Maintains connection to Reticulum network for encrypted messaging</string>
+    <string name="notification_channel_name">Network Service</string>
+    <string name="notification_channel_description">Shows network connection status</string>
+    <string name="connect">Connect</string>
+    <string name="disconnect">Disconnect</string>
+    <string name="connecting">Connecting…</string>
+    <string name="connected">Connected</string>
+    <string name="disconnected">Disconnected</string>
+    <string name="reconnecting">Reconnecting…</string>
+</resources>

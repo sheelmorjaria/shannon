@@ -1,0 +1,33 @@
+-- Database version tracking table
+CREATE TABLE database_metadata (
+    key TEXT NOT NULL PRIMARY KEY,
+    value TEXT NOT NULL
+);
+
+-- Current database version
+getDatabaseVersion:
+SELECT value FROM database_metadata WHERE key = 'db_version';
+
+-- Set database version
+setDatabaseVersion:
+INSERT OR REPLACE INTO database_metadata(key, value) VALUES ('db_version', ?);
+
+-- Initialize database (called on first creation)
+initializeDatabase:
+INSERT INTO database_metadata(key, value) VALUES ('db_version', '1');
+
+-- Database migration log
+CREATE TABLE IF NOT EXISTS migration_log (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    version INTEGER NOT NULL,
+    applied_at INTEGER NOT NULL,
+    description TEXT
+);
+
+-- Log migration
+logMigration:
+INSERT INTO migration_log(version, applied_at, description) VALUES (?, ?, ?);
+
+-- Get migration history
+getMigrationHistory:
+SELECT * FROM migration_log ORDER BY version DESC;

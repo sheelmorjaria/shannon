@@ -1,0 +1,10 @@
+CREATE TABLE config (
+    key TEXT NOT NULL PRIMARY KEY,
+    value TEXT NOT NULL
+);
+
+selectByKey:
+SELECT * FROM config WHERE key = ?;
+
+insert:
+INSERT OR REPLACE INTO config(key, value) VALUES (?, ?);

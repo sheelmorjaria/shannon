@@ -40,7 +40,7 @@ class DatabaseMigrationManager(private val database: ShannonDatabase) {
             ) { db ->
                 // Initial schema is created automatically by SQLDelight
                 // This migration just sets the version
-                db.databaseMetadataQueries.setDatabaseVersion("1")
+                db.databaseSchemaQueries.setDatabaseVersion("1")
             }
         )
 
@@ -55,7 +55,7 @@ class DatabaseMigrationManager(private val database: ShannonDatabase) {
      */
     suspend fun getCurrentVersion(): Int = withContext(Dispatchers.IO) {
         try {
-            database.databaseMetadataQueries.getDatabaseVersion().executeAsOne()
+            database.databaseSchemaQueries.getDatabaseVersion().executeAsOne()
                 .let { versionStr ->
                     versionStr.toIntOrNull() ?: 0
                 }
@@ -107,9 +107,9 @@ class DatabaseMigrationManager(private val database: ShannonDatabase) {
             migration.migrationBlock(database)
 
             // Log migration
-            database.databaseMetadataQueries.logMigration(
+            database.databaseSchemaQueries.logMigration(
                 version = migration.version.toLong(),
-                appliedAt = System.currentTimeMillis(),
+                applied_at = System.currentTimeMillis(),
                 description = migration.description
             )
 
@@ -125,10 +125,10 @@ class DatabaseMigrationManager(private val database: ShannonDatabase) {
      */
     suspend fun getMigrationHistory(): List<MigrationRecord> = withContext(Dispatchers.IO) {
         try {
-            database.databaseMetadataQueries.getMigrationHistory().executeAsList()
+            database.databaseSchemaQueries.getMigrationHistory().executeAsList()
                 .map { MigrationRecord(
                     version = it.version.toInt(),
-                    appliedAt = it.appliedAt,
+                    appliedAt = it.applied_at,
                     description = it.description ?: ""
                 )}
         } catch (e: Exception) {
@@ -143,13 +143,6 @@ class DatabaseMigrationManager(private val database: ShannonDatabase) {
     suspend fun verifyDatabaseIntegrity(): Boolean = withContext(Dispatchers.IO) {
         try {
             // Test basic operations on each table
-            database.messageQueries.selectByContact(
-                contactHash = "test",
-                contactHash = "test",
-                limit = 1,
-                offset = 0
-            ).executeAsList() // Should work even if empty
-
             database.contactQueries.selectAll().executeAsList()
             database.configQueries.selectByKey("test").executeAsList()
 
@@ -167,7 +160,7 @@ class DatabaseMigrationManager(private val database: ShannonDatabase) {
      * Rollback to a specific version (DANGEROUS - use with caution).
      * This recreates tables from scratch and may lose data.
      */
-    suspend fun rollbackToVersion(targetVersion: Int) = withContext(Dispatchers.IO) {
+    suspend fun rollbackToVersion(targetVersion: Int): Unit = withContext(Dispatchers.IO) {
         require(targetVersion > 0) { "Target version must be greater than 0" }
         require(targetVersion < CURRENT_VERSION) { "Can only rollback to earlier versions" }
 

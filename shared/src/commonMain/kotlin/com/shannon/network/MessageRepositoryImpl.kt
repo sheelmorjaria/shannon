@@ -133,4 +133,15 @@ class MessageRepositoryImpl(
             failed
         }
     }
+
+    override suspend fun handleIncomingPacket(packet: LxmfPacket) {
+        val msg = Message(
+            destinationHash = packet.destinationHash,
+            content = packet.content,
+            timestamp = packet.timestamp,
+            state = MessageState.SENT,
+            isOutgoing = false
+        )
+        saveMessage(msg)
+    }
 }

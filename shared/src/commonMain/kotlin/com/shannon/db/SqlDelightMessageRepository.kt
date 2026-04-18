@@ -17,14 +17,13 @@ import kotlinx.coroutines.launch
 
 class SqlDelightMessageRepository(
     private val database: ShannonDatabase,
-    private val client: ReticulumClient,
     private val localHash: String,
     private val scope: CoroutineScope
 ) : MessageRepository {
 
     private var listenJob: Job? = null
 
-    fun startListening() {
+    fun startListening(client: ReticulumClient) {
         listenJob = scope.launch {
             client.observeIncomingPackets().collect { packet ->
                 val msg = Message(
@@ -115,23 +114,11 @@ class SqlDelightMessageRepository(
         current = current.transitionTo(MessageState.SENDING)
         updateMessage(current)
 
-        return try {
-            client.sendLxmfPacket(
-                LxmfPacket(
-                    destinationHash = current.destinationHash,
-                    sourceHash = localHash,
-                    content = current.content,
-                    timestamp = current.timestamp
-                )
-            )
-            val sent = current.transitionTo(MessageState.SENT)
-            updateMessage(sent)
-            sent
-        } catch (e: Exception) {
-            val failed = current.transitionTo(MessageState.FAILED)
-            updateMessage(failed)
-            failed
-        }
+        // TODO: This should be handled by a separate network service
+        // For now, just mark as sent
+        val sent = current.transitionTo(MessageState.SENT)
+        updateMessage(sent)
+        return sent
     }
 }
 

@@ -50,6 +50,27 @@ kotlin {
     }
 }
 
+configurations.all {
+    exclude(group = "androidx.lifecycle", module = "lifecycle-runtime-ktx")
+    exclude(group = "androidx.lifecycle", module = "lifecycle-livedata-core-ktx")
+    exclude(group = "androidx.lifecycle", module = "lifecycle-service")
+    exclude(group = "androidx.appcompat")
+}
+
+configurations.all {
+    resolutionStrategy {
+        // Force dynamic version resolution for JitPack snapshots
+        eachDependency {
+            if (requested.group.startsWith("com.github.torlando-tech")) {
+                useVersion("main-SNAPSHOT")
+            }
+        }
+        // Cache snapshot versions for shorter time to get latest changes
+        cacheDynamicVersionsFor(10, "minutes")
+        cacheChangingModulesFor(10, "minutes")
+    }
+}
+
 sqldelight {
     databases {
         create("ShannonDatabase") {

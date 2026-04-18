@@ -242,7 +242,7 @@ class VoiceCallManagerIntegrated(
     /**
      * Get audio transmission statistics if available.
      */
-    fun getAudioStatistics(): AudioStatistics? {
+    suspend fun getAudioStatistics(): AudioStatistics? {
         return (audioPacketCollector as? RealAudioPacketCollector)?.getStatistics()
     }
 

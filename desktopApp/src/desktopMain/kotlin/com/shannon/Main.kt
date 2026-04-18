@@ -29,20 +29,8 @@ import kotlinx.coroutines.SupervisorJob
 import org.koin.core.context.startKoin
 import org.koin.dsl.module
 
-fun main(args: Array<String>) = application {
-    // Parse command-line arguments
-    val useFakeClient = args.contains("--fake-client")
-    val useRealClient = args.contains("--real-client")
-    val shouldUseRealClient = when {
-        useRealClient -> true
-        useFakeClient -> false
-        else -> true // Default to real client
-    }
-
-    println("Starting Shannon Desktop with ${if (shouldUseRealClient) "REAL" else "FAKE"} Reticulum client")
-    println("Command-line options:")
-    println("  --fake-client  Use fake/mock network client for testing")
-    println("  --real-client  Use real Reticulum network client (default)")
+fun main() = application {
+    println("Starting Shannon Desktop")
 
     startKoin {
         modules(
@@ -54,7 +42,7 @@ fun main(args: Array<String>) = application {
             repositoryModule,
             messageRepositoryModule("local_identity_placeholder"),
             viewModelModule,
-            networkModule(useRealClient = shouldUseRealClient)
+            networkModule()
         )
     }
 
@@ -65,10 +53,9 @@ fun main(args: Array<String>) = application {
 
     Window(
         onCloseRequest = {
-            connectivityViewModel.stopObserving()
             exitApplication()
         },
-        title = "Shannon - ${if (shouldUseRealClient) "Real" else "Fake"} Client"
+        title = "Shannon Desktop"
     ) {
         MaterialTheme {
             App(connectivityViewModel)
@@ -78,7 +65,7 @@ fun main(args: Array<String>) = application {
 
 @Composable
 fun App(connectivityViewModel: ConnectivityViewModel) {
-    val uiState by connectivityViewModel.uiState.collectAsState()
+    val uiState by connectivityViewModel.connectivityState.collectAsState()
 
     Column(
         modifier = Modifier.fillMaxSize().padding(16.dp)
@@ -91,7 +78,7 @@ fun App(connectivityViewModel: ConnectivityViewModel) {
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = "Network Status: ${uiState.connectionStatus}",
+            text = "Network Status: ${uiState.statusText}",
             style = MaterialTheme.typography.bodyLarge
         )
 
@@ -112,10 +99,5 @@ fun App(connectivityViewModel: ConnectivityViewModel) {
         }
 
         Spacer(modifier = Modifier.height(16.dp))
-
-        Text(
-            text = "Client Type: ${if (uiState.connectionStatus.contains("Fake")) "Fake" else "Real"}",
-            style = MaterialTheme.typography.bodySmall
-        )
     }
 }

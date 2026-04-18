@@ -6,7 +6,13 @@ import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
 actual class DatabaseDriverFactory {
     actual fun createDriver(): SqlDriver {
         val driver = JdbcSqliteDriver("jdbc:sqlite:shannon.db")
-        ShannonDatabase.Schema.create(driver)
+
+        // Only create schema if database doesn't exist
+        val databaseFile = java.io.File("shannon.db")
+        if (!databaseFile.exists()) {
+            ShannonDatabase.Schema.create(driver)
+        }
+
         return driver
     }
 }

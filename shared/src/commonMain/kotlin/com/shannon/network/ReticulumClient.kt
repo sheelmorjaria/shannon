@@ -40,7 +40,23 @@ interface ReticulumClient {
 
     /** Disconnect from the network. */
     suspend fun disconnect()
+
+    /** Get the local identity hash. */
+    fun getLocalIdentityHash(): String?
+
+    /** Get current connection information. */
+    fun getConnectionInfo(): ConnectionInfo?
 }
+
+/**
+ * Connection information details.
+ */
+data class ConnectionInfo(
+    val host: String,
+    val port: Int,
+    val status: ConnectionStatus,
+    val identityHash: String?
+)
 
 /**
  * An LXMF messaging packet.

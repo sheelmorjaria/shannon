@@ -8,10 +8,10 @@ import com.shannon.db.SqlDelightMessageRepository
 import com.shannon.domain.repository.ConfigRepository
 import com.shannon.domain.repository.ContactRepository
 import com.shannon.domain.repository.MessageRepository
-import com.shannon.network.FakeReticulumClient
 import com.shannon.network.ReticulumClient
 import com.shannon.network.ReticulumClientImpl
 import com.shannon.network.ReticulumConfig
+import com.shannon.network.VoiceCallManagerIntegrated
 import com.shannon.viewmodel.ConnectivityViewModel
 import com.shannon.viewmodel.ConversationViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -27,7 +27,7 @@ val repositoryModule = module {
 }
 
 fun messageRepositoryModule(localHash: String) = module {
-    single<MessageRepository> { SqlDelightMessageRepository(get(), get(), localHash, get()) }
+    single<MessageRepository> { SqlDelightMessageRepository(get(), localHash, get()) }
 }
 
 val viewModelModule = module {
@@ -47,19 +47,14 @@ val viewModelModule = module {
     }
 }
 
-fun networkModule(useRealClient: Boolean = true) = module {
+fun networkModule() = module {
     single<ReticulumClient> {
-        if (useRealClient) {
-            ReticulumClientImpl(
-                config = ReticulumConfig(),
-                scope = get<CoroutineScope>(),
-                messageRepository = get<MessageRepository>(),
-                audioEngine = getOrNull() // Optional audio engine for voice calls
-            )
-        } else {
-            // Use FakeReticulumClient for testing
-            FakeReticulumClient()
-        }
+        ReticulumClientImpl(
+            config = ReticulumConfig(),
+            scope = get<CoroutineScope>(),
+            messageRepository = getOrNull(), // Break circular dependency
+            audioEngine = getOrNull() // Optional audio engine for voice calls
+        )
     }
 }
 

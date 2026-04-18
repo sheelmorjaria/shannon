@@ -61,7 +61,7 @@ class RealAudioPacketCollector(
     /**
      * Get statistics about audio packet transmission.
      */
-    fun getStatistics(): AudioStatistics {
+    suspend fun getStatistics(): AudioStatistics {
         return packetMutex.withLock {
             AudioStatistics(
                 packetsSent = packetsSent,
@@ -77,7 +77,7 @@ class RealAudioPacketCollector(
     /**
      * Reset statistics counters.
      */
-    fun resetStatistics() {
+    suspend fun resetStatistics() {
         packetMutex.withLock {
             packetsSent = 0L
             packetsDropped = 0L

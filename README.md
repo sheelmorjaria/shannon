@@ -111,7 +111,7 @@ Shannon follows a clean, layered architecture with clear separation of concerns:
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/shannon.git
+git clone https://github.com/sheelmorjaria/shannon.git
 cd shannon
 
 # Build all platforms
@@ -340,7 +340,7 @@ We welcome contributions! Here's how to get started:
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the GPLv3 License - see the [LICENSE](LICENSE) file for details.
 
 ## 🙏 Acknowledgments
 
@@ -353,7 +353,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - **Issues**: Report bugs and request features on GitHub Issues
 - **Discussions**: Join our community discussions on GitHub Discussions
-- **Documentation**: Check our [Wiki](https://github.com/yourusername/shannon/wiki) for detailed docs
+- **Documentation**: Check our [Wiki](https://github.com/sheelmorjaria/shannon/wiki) for detailed docs
 
 ## 🔮 Roadmap
 
@@ -369,8 +369,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [ ] Group conversations
 - [ ] File sharing
 - [ ] Additional transport layers (LoRa, I2P)
-- [ ] iOS platform support
-- [ ] Web-based client
 - [ ] Internationalization
 - [ ] Accessibility improvements
 

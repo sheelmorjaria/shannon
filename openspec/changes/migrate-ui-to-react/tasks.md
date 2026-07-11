@@ -12,10 +12,18 @@
       (codegen from the JVM schema is a future hardening step; for now kept in sync manually).
 
 ## 2. Bridge server (Kotlin/JVM, desktopApp)
-- [ ] 2.1 Add ktor-server-websockets (or equivalent) to `desktopApp`; bind to **localhost only**.
-- [ ] 2.2 Implement JSON-RPC 2.0 framing over the WebSocket.
+- [x] 2.1 Add ktor-server-websockets to `desktopApp`; bind to **localhost only**.
+      (ktor 3.0.3 + CIO engine; `BridgeServer` binds `127.0.0.1` on `/bridge`, dispatches
+      `RpcRequest`s and streams `RpcNotification`s. desktopApp compiles. Live WS integration
+      test is §2.5; the concrete `BridgeBackend` impl is §2.3.)
+- [x] 2.2 Implement JSON-RPC 2.0 framing over the WebSocket.
+      (`BridgeRequestHandler` decodes `RpcRequest`→`BridgeCommand`, dispatches, returns
+      `RpcResponse`/JSON-RPC error; tested.)
 - [ ] 2.3 Wire commands to repositories / `VoiceCallManager` / `CaptionViewModel` / `CaptionTransport`.
-- [ ] 2.4 Stream Kotlin Flows as JSON-RPC notifications (subscribe/unsubscribe).
+      *(Dispatch layer done + tested: `BridgeDispatcher` maps commands → `BridgeBackend`. The concrete
+      `DesktopBridgeBackend` that calls the real repos/managers is pending with the ktor transport, §2.1.)*
+- [x] 2.4 Stream Kotlin Flows as JSON-RPC notifications (subscribe/unsubscribe).
+      (`FlowBridge` maps backend `Flow`s → `RpcNotification`s; tested.)
 - [ ] 2.5 Bridge tests: command dispatch + flow streaming with fakes (reuse `FakeReticulumClient`,
       `InMemoryNetwork`) and a small WS test client.
 

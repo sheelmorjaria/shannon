@@ -14,6 +14,10 @@ kotlin {
                 implementation(compose.desktop.currentOs)
                 implementation(compose.material3)
                 implementation(libs.koin.core)
+                implementation(libs.kotlinx.serialization.json)
+                implementation(libs.ktor.server.core)
+                implementation(libs.ktor.server.websockets)
+                implementation(libs.ktor.server.cio)
             }
         }
     }

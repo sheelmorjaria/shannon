@@ -61,6 +61,11 @@ class DefaultBridgeBackend(
     override suspend fun disconnect() = client.disconnect()
     override suspend fun announce() = client.announce()
 
+    override fun feedAudioPcm(samples: ShortArray) {
+        // §5.2: browser mic PCM → on-device STT engine (same path as local mic capture).
+        if (speech.isAvailable) speech.feedPcm(samples)
+    }
+
     // --- subscriptions ---
     override fun observeMessages(): Flow<List<MessageDto>> =
         selectedContact.flatMapLatest { hash ->

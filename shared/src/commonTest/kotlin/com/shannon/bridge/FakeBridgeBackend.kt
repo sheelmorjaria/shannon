@@ -18,6 +18,7 @@ class FakeBridgeBackend : BridgeBackend {
     var connected: Pair<String, Int>? = null; private set
     var disconnectCount = 0; private set
     var announceCount = 0; private set
+    val fedAudioSamples = mutableListOf<Short>()
 
     private val _messages = MutableStateFlow<List<MessageDto>>(emptyList())
     private val _captions = MutableStateFlow<List<CaptionDto>>(emptyList())
@@ -41,6 +42,7 @@ class FakeBridgeBackend : BridgeBackend {
     override suspend fun connect(host: String, port: Int) { connected = host to port }
     override suspend fun disconnect() { disconnectCount++ }
     override suspend fun announce() { announceCount++ }
+    override fun feedAudioPcm(samples: ShortArray) { fedAudioSamples.addAll(samples.toList()) }
 
     override fun observeMessages(): Flow<List<MessageDto>> = _messages.asStateFlow()
     override fun observeCaptions(): Flow<List<CaptionDto>> = _captions.asStateFlow()

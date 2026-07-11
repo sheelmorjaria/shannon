@@ -11,6 +11,8 @@ export interface Backend {
   connect(): Promise<void>
   send<C extends BridgeCommand>(command: C): Promise<RpcResponse>
   on<T extends BridgeEvent['method']>(method: T, handler: EventHandler<T>): () => void
+  /** Send raw PCM audio as a binary frame (§5.2 browser WebAudio). */
+  sendAudio(buffer: ArrayBuffer): void
   close(): void
 }
 
@@ -29,6 +31,7 @@ export class RealBackend implements Backend {
     return this.client.on(method, handler)
   }
   close() { this.client.close() }
+  sendAudio(buffer: ArrayBuffer) { this.client.sendAudio(buffer) }
 }
 
 /**
@@ -68,6 +71,7 @@ export class MockBackend implements Backend {
   }
 
   close() { this.connectedState = false }
+  sendAudio(_: ArrayBuffer) { /* no-op in mock mode */ }
 }
 
 /**

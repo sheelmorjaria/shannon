@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Shannon // Decentralized Speech-to-Speech Mesh Suite</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'IBM Plex Mono', 'ui-monospace', 'monospace'],
+          },
+          colors: {
+            bg: '#0c0d0f',
+            surface: '#14161a',
+            fg: '#f3f4f6',
+            muted: '#8b949e',
+            border: 'rgba(255,255,255,0.08)',
+            accent: '#10b981',
+            accentSec: '#38bdf8'
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #0c0d0f;
+      background-image: 
+        radial-gradient(circle at 15% 15%, rgba(16, 185, 129, 0.04) 0%, transparent 40%),
+        radial-gradient(circle at 85% 85%, rgba(56, 189, 248, 0.04) 0%, transparent 40%),
+        linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      background-size: 100% 100%, 100% 100%, 48px 48px, 48px 48px;
+    }
+    .letter-spacing-heading {
+      letter-spacing: -0.02em;
+    }
+    .letter-spacing-caps {
+      letter-spacing: 0.08em;
+    }
+  </style>
+</head>
+<body class="text-fg min-h-screen flex flex-col justify-between overflow-x-hidden">
+
+  <!-- Header -->
+  <header class="border-b border-border py-4 px-6 md:px-12 flex justify-between items-center bg-bg/80 backdrop-blur-md sticky top-0 z-50" data-od-id="header-nav">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-accent to-accentSec flex items-center justify-center font-mono font-bold text-bg text-sm">
+        S
+      </div>
+      <div>
+        <h1 class="text-lg font-bold tracking-tight text-fg font-sans leading-none flex items-center gap-2">
+          SHANNON 
+          <span class="text-[10px] font-mono font-medium px-1.5 py-0.5 rounded border border-accent/20 text-accent uppercase tracking-wider bg-accent/5">v1.2.0-mesh</span>
+        </h1>
+        <p class="text-[10px] font-mono text-muted mt-1 leading-none">RETI-MESH-COMMUNICATOR</p>
+      </div>
+    </div>
+    
+    <div class="flex items-center gap-4 text-xs font-mono">
+      <div class="flex items-center gap-2 px-3 py-1.5 rounded-full border border-border bg-surface/50 text-[11px] text-muted">
+        <span class="w-1.5 h-1.5 rounded-full bg-accent animate-pulse"></span>
+        <span>RETICULUM LINK ACTIVE</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="flex-grow max-w-7xl mx-auto w-full px-6 md:px-12 py-12 flex flex-col gap-12" data-od-id="main-container">
+    
+    <!-- Hero / Intro -->
+    <div class="text-center max-w-3xl mx-auto flex flex-col gap-4 py-6" data-od-id="hero-intro">
+      <div class="inline-flex self-center items-center gap-2 px-3 py-1 rounded border border-accentSec/20 bg-accentSec/5 text-[11px] font-mono text-accentSec uppercase letter-spacing-caps">
+        Off-Grid Cryptographic Speech Suite
+      </div>
+      <h2 class="text-4xl md:text-5xl font-extrabold letter-spacing-heading text-fg font-sans leading-tight">
+        Zero-trust global speech translation without internet
+      </h2>
+      <p class="text-sm md:text-base text-muted leading-relaxed">
+        Shannon leverages the decentralized <span class="text-fg font-semibold">Reticulum Mesh Network</span> for end-to-end encrypted messaging (<span class="font-mono text-xs text-accent">LXMF</span>) and real-time peer-to-peer voice calls (<span class="font-mono text-xs text-accentSec">LXST</span>). Featuring fully <span class="text-fg font-semibold">on-device Speech-to-Text &amp; Text-to-Speech translation</span> to enable frictionless communication across language barriers.
+      </p>
+    </div>
+
+    <!-- Active Platforms / Viewports -->
+    <div class="grid md:grid-cols-2 gap-8 items-stretch" data-od-id="platform-cards">
+      
+      <!-- Desktop Interface Preview -->
+      <a href="desktop.html" class="group flex flex-col bg-surface border border-border hover:border-accentSec/30 rounded-xl overflow-hidden transition-all duration-300 hover:shadow-[0_20px_50px_rgba(56,189,248,0.03)]" data-od-id="card-desktop-link">
+        <div class="p-8 flex flex-col justify-between flex-grow gap-6">
+          <div class="flex justify-between items-start">
+            <div class="flex flex-col gap-1">
+              <span class="text-[10px] font-mono text-accentSec uppercase tracking-wider">PLATFORM TARGET // 01</span>
+              <h3 class="text-xl font-bold text-fg group-hover:text-accentSec transition-colors">Desktop Operator Terminal</h3>
+            </div>
+            <span class="px-2 py-1 rounded bg-accentSec/10 text-accentSec font-mono text-[10px] uppercase">WIDESCREEN UX</span>
+          </div>
+          
+          <!-- Mockup Element -->
+          <div class="relative bg-bg border border-border rounded-lg aspect-video overflow-hidden p-3 flex flex-col gap-2 transition-transform duration-300 group-hover:scale-[1.02]">
+            <!-- Desktop Topbar -->
+            <div class="flex items-center justify-between border-b border-border/60 pb-2">
+              <div class="flex items-center gap-1.5">
+                <span class="w-2.5 h-2.5 rounded-full bg-red-500/80"></span>
+                <span class="w-2.5 h-2.5 rounded-full bg-yellow-500/80"></span>
+                <span class="w-2.5 h-2.5 rounded-full bg-green-500/80"></span>
+              </div>
+              <span class="text-[9px] font-mono text-muted">shannon://terminal-0a3f</span>
+              <div class="w-8"></div>
+            </div>
+            <!-- Split Pane Mock -->
+            <div class="flex-grow grid grid-cols-4 gap-2 text-[9px] font-mono text-muted">
+              <!-- Sidebar -->
+              <div class="border-r border-border/40 pr-2 flex flex-col gap-1.5">
+                <div class="h-2 w-full bg-surface rounded"></div>
+                <div class="h-2 w-4/5 bg-surface rounded"></div>
+                <div class="h-2 w-3/4 bg-surface rounded"></div>
+                <div class="mt-auto h-3 w-full bg-accent/20 border border-accent/20 rounded flex items-center justify-center text-[7px] text-accent font-bold">NODE: ONLINE</div>
+              </div>
+              <!-- Chat Area -->
+              <div class="col-span-2 flex flex-col justify-between h-full gap-2">
+                <div class="flex flex-col gap-1.5">
+                  <div class="h-3 w-2/3 bg-surface rounded self-start"></div>
+                  <div class="h-3 w-1/2 bg-accentSec/20 rounded self-end"></div>
+                  <div class="h-3 w-3/4 bg-surface rounded self-start"></div>
+                </div>
+                <div class="h-3.5 w-full bg-surface border border-border rounded"></div>
+              </div>
+              <!-- Translation/AI panel -->
+              <div class="border-l border-border/40 pl-2 flex flex-col gap-2">
+                <div class="text-[7px] text-accentSec uppercase font-bold tracking-wider">LXST AUDIO STT</div>
+                <div class="flex flex-col gap-1">
+                  <div class="h-1.5 w-full bg-accentSec/15 rounded"></div>
+                  <div class="h-1.5 w-5/6 bg-accentSec/15 rounded"></div>
+                  <div class="h-1.5 w-full bg-accentSec/15 rounded"></div>
+                </div>
+                <div class="mt-auto h-3.5 w-full bg-surface/80 rounded border border-border/60 flex items-center justify-center text-[7px]">EN &harr; ES</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-2">
+            <p class="text-xs text-muted leading-relaxed">
+              Designed for desktop mesh workstations. Comprehensive split-pane display including detailed contact cryptographic metadata, full-density translation configuration, direct LXST voice calling log, and system performance telemetry (offline model parameter settings).
+            </p>
+            <div class="text-xs font-mono text-accentSec flex items-center gap-1.5 mt-2 font-semibold">
+              OPEN DESKTOP TERMINAL &rarr;
+            </div>
+          </div>
+        </div>
+      </a>
+
+      <!-- Mobile Interface Preview -->
+      <a href="mobile.html" class="group flex flex-col bg-surface border border-border hover:border-accent/30 rounded-xl overflow-hidden transition-all duration-300 hover:shadow-[0_20px_50px_rgba(16,185,129,0.03)]" data-od-id="card-mobile-link">
+        <div class="p-8 flex flex-col justify-between flex-grow gap-6">
+          <div class="flex justify-between items-start">
+            <div class="flex flex-col gap-1">
+              <span class="text-[10px] font-mono text-accent uppercase tracking-wider">PLATFORM TARGET // 02</span>
+              <h3 class="text-xl font-bold text-fg group-hover:text-accent transition-colors">Mobile Field Node</h3>
+            </div>
+            <span class="px-2 py-1 rounded bg-accent/10 text-accent font-mono text-[10px] uppercase">MOBILE WEB / APP</span>
+          </div>
+
+          <!-- Mockup Element -->
+          <div class="relative bg-bg border border-border rounded-lg aspect-video overflow-hidden p-3 flex justify-center items-center transition-transform duration-300 group-hover:scale-[1.02]">
+            <!-- Smartphone frame mockup -->
+            <div class="w-24 h-full border border-border bg-surface rounded-xl p-1 flex flex-col gap-1 relative shadow-lg">
+              <!-- Camera Notch -->
+              <div class="w-8 h-2 bg-bg rounded-full mx-auto"></div>
+              <!-- Screen representation -->
+              <div class="flex-grow bg-bg rounded-lg p-1 flex flex-col gap-1 text-[7px] font-mono justify-between">
+                <!-- Status bar -->
+                <div class="flex justify-between text-[5px] text-muted leading-none">
+                  <span>9:41</span>
+                  <span>[|i|] MESH</span>
+                </div>
+                <!-- Mini chat layout -->
+                <div class="flex flex-col gap-1">
+                  <div class="w-4/5 h-2.5 bg-surface/80 rounded-md"></div>
+                  <div class="w-3/4 h-2.5 bg-accent/15 rounded-md self-end"></div>
+                </div>
+                <!-- Dynamic Wave Call HUD -->
+                <div class="bg-accent/5 border border-accent/20 rounded p-1 flex flex-col gap-0.5 mt-auto">
+                  <div class="flex justify-between items-center text-[5px] text-accent">
+                    <span>LXST CALL IN PROGRESS</span>
+                    <span class="animate-pulse">&bull;</span>
+                  </div>
+                  <div class="h-2 flex items-center justify-center gap-0.5">
+                    <span class="w-0.5 h-1.5 bg-accent rounded"></span>
+                    <span class="w-0.5 h-3 bg-accent rounded animate-bounce"></span>
+                    <span class="w-0.5 h-2 bg-accent rounded"></span>
+                    <span class="w-0.5 h-1 bg-accent rounded"></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-2">
+            <p class="text-xs text-muted leading-relaxed">
+              Designed for off-grid operations on mobile handsets. Optimised touchscreen ergonomics featuring simplified interface cards, intuitive translation toggle sliders, dedicated voice stream subtitles HUD, and offline resource management.
+            </p>
+            <div class="text-xs font-mono text-accent flex items-center gap-1.5 mt-2 font-semibold">
+              OPEN MOBILE FIELD NODE &rarr;
+            </div>
+          </div>
+        </div>
+      </a>
+
+    </div>
+
+    <!-- Interactive Mesh Translation Simulation Sandbox -->
+    <div class="border border-border bg-surface/50 rounded-xl p-6 md:p-8 flex flex-col gap-6" data-od-id="interactive-spec">
+      <div class="flex flex-col gap-1">
+        <h3 class="text-lg font-bold text-fg font-sans">Interactive Reticulum Transport Architecture</h3>
+        <p class="text-xs text-muted">Click the nodes to simulate encryption and on-device STT/TTS translation pipeline during transit.</p>
+      </div>
+
+      <!-- Simulator Layout Grid -->
+      <div class="grid lg:grid-cols-3 gap-6 items-stretch">
+        <!-- Node A -->
+        <div class="bg-surface border border-border p-5 rounded-lg flex flex-col gap-4">
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-accentSec"></span>
+            <span class="text-xs font-mono font-bold text-fg">LOCAL NODE: [shannon.node.a]</span>
+          </div>
+          <div class="flex flex-col gap-1.5">
+            <label class="text-[10px] font-mono uppercase text-muted">Origin Spoken Voice (Spanish)</label>
+            <div class="bg-bg border border-border/80 rounded p-2 text-xs text-fg font-mono h-14 flex items-center justify-center text-center">
+              "Hola, ¿cómo está la calidad del enlace de radio?"
+            </div>
+          </div>
+          <button onclick="simulatePayload()" class="w-full py-2 bg-accentSec/10 border border-accentSec/20 text-accentSec rounded text-xs font-mono font-medium hover:bg-accentSec/20 transition-all">
+            PROCESS &amp; TRANSMIT PAYLOAD
+          </button>
+        </div>
+
+        <!-- The Pipeline / Transport -->
+        <div class="bg-bg border border-border p-5 rounded-lg flex flex-col justify-center items-center relative min-h-[160px] overflow-hidden">
+          <!-- Flow Line Background -->
+          <div class="absolute inset-x-0 h-0.5 bg-border top-1/2 -translate-y-1/2"></div>
+          
+          <div id="status-display" class="z-10 bg-surface/90 border border-border rounded-lg p-4 max-w-xs text-center flex flex-col gap-2 shadow-xl">
+            <span class="text-[10px] font-mono text-accent font-bold tracking-wider uppercase" id="step-label">PIPELINE STANDBY</span>
+            <p class="text-[11px] text-muted leading-relaxed" id="step-desc">Click Transmit on Local Node to see cryptographic encryption, packet dispatch, and translation routing over Reticulum.</p>
+          </div>
+          
+          <!-- Animated Pulse Dot -->
+          <div id="pulse-dot" class="absolute w-4 h-4 rounded-full bg-accent animate-ping hidden" style="left: 10%; top: 48%;"></div>
+        </div>
+
+        <!-- Node B -->
+        <div class="bg-surface border border-border p-5 rounded-lg flex flex-col gap-4">
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-accent"></span>
+            <span class="text-xs font-mono font-bold text-fg">REMOTE PEER: [shannon.node.b]</span>
+          </div>
+          <div class="flex flex-col gap-1.5">
+            <label class="text-[10px] font-mono uppercase text-muted">Destination Synthetic Translation (English)</label>
+            <div class="bg-bg border border-border/80 rounded p-2 text-xs text-muted font-mono h-14 flex items-center justify-center text-center italic" id="result-text">
+              Waiting for cryptographic transit stream...
+            </div>
+          </div>
+          <button class="w-full py-2 border border-border text-muted rounded text-xs font-mono font-medium cursor-not-allowed" disabled>
+            SYNTHESIS ENGINE READY
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Architecture details -->
+    <div class="grid sm:grid-cols-3 gap-6" data-od-id="architecture-details">
+      <div class="bg-surface/30 border border-border p-5 rounded-lg flex flex-col gap-2">
+        <h4 class="text-xs font-mono text-accent uppercase tracking-wider font-bold">01 // Reticulum Core</h4>
+        <p class="text-xs text-muted leading-relaxed">
+          Zero-configuration decentralized mesh routing layer. Cryptographically secure end-to-end addressing (using Ed25519 and Curve25519) that works independently of telecommunication infrastructure.
+        </p>
+      </div>
+      <div class="bg-surface/30 border border-border p-5 rounded-lg flex flex-col gap-2">
+        <h4 class="text-xs font-mono text-accentSec uppercase tracking-wider font-bold">02 // LXMF Messaging</h4>
+        <p class="text-xs text-muted leading-relaxed">
+          Lightweight Extensible Message Format. Secure end-to-end encrypted packet protocol for text messages, ensuring messages survive packet loss through store-and-forward mesh propagation.
+        </p>
+      </div>
+      <div class="bg-surface/30 border border-border p-5 rounded-lg flex flex-col gap-2">
+        <h4 class="text-xs font-mono text-fg uppercase tracking-wider font-bold">03 // LXST Voice &amp; translation</h4>
+        <p class="text-xs text-muted leading-relaxed">
+          Lightweight Extensible Voice Stream. Optimized audio codec transmission. Converts voice packets locally using Distil-Whisper model, translates text, and reads synthesis locally via VITS.
+        </p>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-border py-6 px-12 text-center text-xs font-mono text-muted bg-surface/10" data-od-id="footer-note">
+    <span>SHANNON RETICULUM CLIENT &bull; SECURITY RATED: E2EE COMPLIANT &bull; OFFLINE LOCAL FIRST</span>
+  </footer>
+
+  <script>
+    const steps = [
+      { label: "01 // SPEECH COMPRESSION", desc: "Local Node processes spoken voice. Compressing frame packets for low-bandwidth mesh stream...", color: "#38bdf8" },
+      { label: "02 // LXST TRANSMISSION", desc: "Voice payload cryptographically wrapped in Curve25519 envelope and sent over Reticulum mesh link...", color: "#10b981" },
+      { label: "03 // LOCAL SPEECH-TO-TEXT", desc: "Remote peer receives voice stream. Local Distil-Whisper model begins live transcription...", color: "#38bdf8" },
+      { label: "04 // LOCAL MACHINE TRANSLATION", desc: "Text is sent through on-device translation engine. Spanish sentence decoded into high-quality English...", color: "#10b981" },
+      { label: "05 // TEXT-TO-SPEECH SYNTHESIS", desc: "VITS synthesizer outputs clear, localized speech for the receiving listener in real-time.", color: "#10b981" }
+    ];
+
+    let currentStep = 0;
+    let timer = null;
+
+    function simulatePayload() {
+      if (timer) return;
+      
+      const labelEl = document.getElementById("step-label");
+      const descEl = document.getElementById("step-desc");
+      const resultEl = document.getElementById("result-text");
+      const dot = document.getElementById("pulse-dot");
+      
+      resultEl.textContent = "Processing speech payload...";
+      resultEl.classList.add("animate-pulse");
+      dot.classList.remove("hidden");
+      
+      currentStep = 0;
+      
+      const runStep = () => {
+        if (currentStep < steps.length) {
+          const step = steps[currentStep];
+          labelEl.textContent = step.label;
+          labelEl.style.color = step.color;
+          descEl.textContent = step.desc;
+          
+          // Animate the dot across
+          const percent = 15 + (currentStep * 18);
+          dot.style.left = percent + "%";
+          
+          currentStep++;
+          timer = setTimeout(runStep, 1500);
+        } else {
+          // Finished!
+          labelEl.textContent = "PIPELINE STANDBY // SECURE";
+          labelEl.style.color = "#10b981";
+          descEl.textContent = "Translation pipeline complete. Ready for next transmission.";
+          
+          resultEl.textContent = '"Hello, how is the quality of the radio link?"';
+          resultEl.classList.remove("animate-pulse");
+          resultEl.classList.remove("text-muted");
+          resultEl.classList.add("text-accentSec");
+          resultEl.classList.add("font-semibold");
+          
+          dot.classList.add("hidden");
+          clearTimeout(timer);
+          timer = null;
+        }
+      };
+      
+      runStep();
+    }
+  </script>
+</body>
+</html>

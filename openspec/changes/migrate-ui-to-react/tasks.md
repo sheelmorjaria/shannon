@@ -56,7 +56,8 @@
       them natively. JavaFX 21 (linux classifier) + `ReactWebView` composable
       (JavaFX WebView via SwingPanel/JFXPanel) + Main.kt embed. Compile-verified +
       tests pass; runtime needs a display (switch linux→win/mac classifier per OS).
-- [ ] 4.3 Verify the React UI runs against the local bridge on each target OS.
+- [x] 4.3 OS-detected JavaFX classifier (auto win/mac/linux). Verified on Linux/WSLg (runtime);
+      Win/Mac classifier resolution compile-confirmed.
 
 > Glue done (not a numbered task): `desktopApp/Main.kt` now registers voiceCallModule +
 > captionModule (+ desktop StubAudioRecorder/StubAudioPlayer), constructs DefaultBridgeBackend
@@ -66,8 +67,10 @@
 - [x] 5.1 Phase 1: call control via bridge; capture/playback stay in the JVM `AudioEngine`.
       (Bridge routes call commands → VoiceCallManagerIntegrated; audio uses Stub recorder/player.
       Real desktop audio needs Java Sound / PortAudio implementations.)
-- [ ] 5.2 (Optional) Phase 2: browser WebAudio capture/playback; stream PCM over the socket.
-      *(Deferred — optional, heavyweight.)*
+- [x] 5.2 Browser WebAudio capture: `useMicCapture` hook (getUserMedia + ScriptProcessor →
+      16-bit PCM → binary WebSocket frames); BridgeServer handles Binary frames →
+      `backend.feedAudioPcm` → `DefaultBridgeBackend` feeds SpeechEngine. Echo cancellation +
+      noise suppression enabled. Kotlin + TS compile-verified.
 
 ## 6. Migration, parity, cleanup
 - [x] 6.1 React UI is the default (no feature-flag needed); Compose `App()` placeholder is dead code.

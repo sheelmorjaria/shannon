@@ -96,6 +96,14 @@ export class BridgeClient {
     }
   }
 
+  /** Send raw PCM audio as a binary WebSocket frame (§5.2 browser WebAudio). */
+  sendAudio(buffer: ArrayBuffer): void {
+    const socket = this.socket
+    if (socket && socket.readyState === WebSocket.OPEN) {
+      socket.send(buffer)
+    }
+  }
+
   close(): void {
     this.socket?.close()
     this.socket = null

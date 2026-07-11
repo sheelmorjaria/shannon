@@ -16,15 +16,19 @@ dependencies {
     implementation(libs.ktor.client.core)
     implementation(libs.ktor.client.cio)
     implementation(libs.ktor.client.websockets)
-    // JavaFX WebView (§4.2): standard Gradle DependencyHandler supports classifier notation
-    // (KGP's KotlinDependencyHandler in KMP sourceSets silently dropped them).
-    // Switch linux→win/mac on other platforms.
-    implementation("org.openjfx:javafx-base:21:linux")
-    implementation("org.openjfx:javafx-graphics:21:linux")
-    implementation("org.openjfx:javafx-controls:21:linux")
-    implementation("org.openjfx:javafx-web:21:linux")
-    implementation("org.openjfx:javafx-media:21:linux")
-    implementation("org.openjfx:javafx-swing:21:linux")
+    // JavaFX WebView (§4.2 + §4.3): OS-detected classifier — standard Gradle DependencyHandler
+    // resolves them (KGP's KotlinDependencyHandler in KMP silently dropped classifiers).
+    val osClassifier = when {
+        System.getProperty("os.name").lowercase().contains("win") -> "win"
+        System.getProperty("os.name").lowercase().contains("mac") -> "mac"
+        else -> "linux"
+    }
+    implementation("org.openjfx:javafx-base:21:$osClassifier")
+    implementation("org.openjfx:javafx-graphics:21:$osClassifier")
+    implementation("org.openjfx:javafx-controls:21:$osClassifier")
+    implementation("org.openjfx:javafx-web:21:$osClassifier")
+    implementation("org.openjfx:javafx-media:21:$osClassifier")
+    implementation("org.openjfx:javafx-swing:21:$osClassifier")
 
     testImplementation(libs.kotlin.test)
     testImplementation(libs.kotlinx.coroutines.core)

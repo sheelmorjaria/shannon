@@ -12,9 +12,11 @@ import io.ktor.server.routing.routing
 import io.ktor.server.websocket.WebSockets
 import io.ktor.server.websocket.webSocket
 import io.ktor.websocket.Frame
+import io.ktor.websocket.readBytes
 import io.ktor.websocket.readText
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.launch
+import com.shannon.audio.Pcm
 import kotlinx.serialization.json.Json
 
 /**
@@ -26,7 +28,7 @@ import kotlinx.serialization.json.Json
  * engine (pure JVM, no native dependencies), suitable for a desktop app.
  */
 class BridgeServer(
-    backend: BridgeBackend,
+    private val backend: BridgeBackend,
     private val port: Int = DEFAULT_PORT,
 ) {
     private val handler = BridgeRequestHandler(BridgeDispatcher(backend))
@@ -72,16 +74,24 @@ class BridgeServer(
                         }
                     }
                     try {
-                        // Inbound: read JSON-RPC requests and reply with responses.
+                        // Inbound: read JSON-RPC requests (Text frames) and PCM audio (Binary frames).
                         for (frame in incoming) {
-                            val text = (frame as? Frame.Text)?.readText() ?: continue
-                            val response = try {
-                                val request = json.decodeFromString(RpcRequest.serializer(), text)
-                                handler.handle(request)
-                            } catch (e: Exception) {
-                                RpcResponse(id = 0, error = RpcError(-32700, "Parse error: ${e.message}"))
+                            when (frame) {
+                                is Frame.Text -> {
+                                    val response = try {
+                                        val request = json.decodeFromString(RpcRequest.serializer(), frame.readText())
+                                        handler.handle(request)
+                                    } catch (e: Exception) {
+                                        RpcResponse(id = 0, error = RpcError(-32700, "Parse error: ${e.message}"))
+                                    }
+                                    outgoing.send(Frame.Text(json.encodeToString(RpcResponse.serializer(), response)))
+                                }
+                                is Frame.Binary -> {
+                                    // §5.2: browser WebAudio PCM → on-device STT / outgoing AUDIO path.
+                                    backend.feedAudioPcm(Pcm.toShortArray(frame.readBytes()))
+                                }
+                                else -> {}
                             }
-                            outgoing.send(Frame.Text(json.encodeToString(RpcResponse.serializer(), response)))
                         }
                     } finally {
                         outgoingJob.cancel()

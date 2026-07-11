@@ -22,6 +22,9 @@ interface BridgeBackend {
     suspend fun disconnect()
     suspend fun announce()
 
+    /** Feed PCM audio captured in the browser (via WebAudio) into the Kotlin audio/STT path. §5.2. */
+    fun feedAudioPcm(samples: ShortArray)
+
     // --- subscriptions (server → client streams) ---
     fun observeMessages(): Flow<List<MessageDto>>
     fun observeCaptions(): Flow<List<CaptionDto>>

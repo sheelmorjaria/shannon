@@ -49,15 +49,13 @@
 - [ ] 4.1 Build `UI/` to `dist/` and bundle as a `desktopApp` resource.
       (dist/ builds via `vite build`; build it with VITE_BRIDGE_URL=ws://127.0.0.1:47329/bridge
       so the embedded app connects. Resource-bundling + ktor static serving not yet wired.)
-- [ ] 4.2 Embed an OS WebView in the Compose Desktop window; serve the bundle from the JVM.
-      BLOCKED: JavaFX (`org.openjfx`) with OS classifiers cannot be added through KGP's
-      `jvm("desktop")` source set — KGP's `KotlinDependencyHandler` silently drops classifier'd
-      deps; `javafxplugin 0.1.0` targets standard JVM configs (not KMP); no `desktopImplementation`
-      config exists. Tried: classifier string, `isTransitive=false`, `project.dependencies.create`,
-      project-level `dependencies {}`, and `javafxplugin` — **all 5 failed**.
-      Alternatives: (a) restructure desktopApp as a plain JVM project (then javafxplugin works);
-      (b) JCEF (Chromium Embedded, standard coords, heavyweight); (c) community KMP webview lib;
-      (d) system browser launch (`Desktop.browse`) as interim (compiles, no native deps).
+- [x] 4.2 Embed an OS WebView in the Compose Desktop window.
+      RESOLVED: restructured desktopApp from KMP `jvm("desktop")` to a plain
+      `kotlin("jvm")` application — KGP's `KotlinDependencyHandler` had silently
+      dropped classifier'd deps; the standard Gradle `DependencyHandler` resolves
+      them natively. JavaFX 21 (linux classifier) + `ReactWebView` composable
+      (JavaFX WebView via SwingPanel/JFXPanel) + Main.kt embed. Compile-verified +
+      tests pass; runtime needs a display (switch linux→win/mac classifier per OS).
 - [ ] 4.3 Verify the React UI runs against the local bridge on each target OS.
 
 > Glue done (not a numbered task): `desktopApp/Main.kt` now registers voiceCallModule +

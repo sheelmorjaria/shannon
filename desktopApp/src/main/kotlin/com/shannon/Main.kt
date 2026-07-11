@@ -30,6 +30,7 @@ import com.shannon.di.repositoryModule
 import com.shannon.di.viewModelModule
 import com.shannon.di.voiceCallModule
 import com.shannon.network.ReticulumClient
+import com.shannon.ui.ReactWebView
 import com.shannon.viewmodel.ConnectivityViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -79,6 +80,12 @@ fun main() = application {
     bridge.start()
     println("Shannon bridge listening on ws://127.0.0.1:${BridgeServer.DEFAULT_PORT}/bridge")
 
+    val webUrl = System.getProperty("shannon.web.url") ?: listOf(
+        java.io.File("UI/dist/index.html"),
+        java.io.File("../UI/dist/index.html"),
+    ).firstOrNull { it.exists() }?.let { "file://${it.absolutePath}" } ?: "about:blank"
+    println("Loading Shannon UI from $webUrl")
+
     Window(
         onCloseRequest = {
             bridge.stop()
@@ -87,7 +94,7 @@ fun main() = application {
         title = "Shannon Desktop"
     ) {
         MaterialTheme {
-            App(connectivityViewModel)
+            ReactWebView(webUrl, Modifier.fillMaxSize())
         }
     }
 }

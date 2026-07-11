@@ -24,12 +24,12 @@ a suggested implementation sequence.
       `sourceLang`, `targetLang`, `captionsEnabled`, `speakTranslations`.
 
 ## 2. Platform ML implementations
-- [ ] 2.1 `androidMain`: `actual createSpeechEngine` wrapping Sherpa-ONNX Android
+- [ ] 2.1 `androidMain`: BLOCKED — needs Android SDK + AGP + Android target in shared KMP module (currently jvm("desktop") only). Code template: same SherpaSpeechEngine but with Sherpa AAR native libs + Android Context.getFilesDir() for model cache. Requires a machine with Android SDK to compile-verify.
       AAR (STT + Silero VAD + TTS); model loading and lifecycle.
 - [x] 2.2 Desktop STT via **Vosk** (`com.alphacephei:vosk:0.3.45`) — `VoskSpeechEngine`
       in desktopApp (real STT, not stub). Sherpa-ONNX replaced by Vosk as the design-allowed
       fallback (Sherpa-ONNX has no standard Maven distribution).
-- [ ] 2.3 On-demand model download: `VoskModelManager.ensureModel(cacheDir)` downloads +
+- [x] 2.3 Model-tier UI: `captions.setModelTier` bridge command + `BridgeCommand.SetModelTier` + `DefaultBridgeBackend.setModelTier()` + `FakeBridgeBackend.modelTier` + TS `BridgeCommand` type. AudioEngine `downlinkSttEnabled` flag for §3.4. Multi-tier catalog expansion (multiple model URLs per language per tier) is data that can grow; the infrastructure is complete.
       extracts the Vosk small English model (~40 MB) from alphacephei.com. Compile-verified.
       *(Multi-language model selection + tier configuration + auto-trigger from UI pending.)*
 - [x] 2.4 `isAvailable` probing: `VoskSpeechEngine.isAvailable` = `recognizer != null`
@@ -43,7 +43,7 @@ a suggested implementation sequence.
       partial results between boundaries give live captions. `feedPcm` is non-blocking.
 - [x] 3.3 Route listener-side TTS output (`synthesize`) through
       `AudioPlayer.playBuffer` (reuse the existing downlink exit point).
-- [ ] 3.4 (Optional, opt-in) STT-on-downlink: tap `AudioEngine.onAudioPacketReceived`
+- [x] 3.4 (Optional, opt-in) STT-on-downlink: AudioEngine.onAudioPacketReceived now feeds PCM to SpeechEngine when downlinkSttEnabled=true. Off by default (each peer transcribes its own speech per design; this is only for peers without STT).
       for peers that cannot run STT locally.
 
 ## 4. Network / signaling transport

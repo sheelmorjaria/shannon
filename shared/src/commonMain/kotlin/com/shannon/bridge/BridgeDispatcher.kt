@@ -17,6 +17,7 @@ class BridgeDispatcher(private val backend: BridgeBackend) {
             is BridgeCommand.SetSpeakTranslations -> backend.setSpeakTranslations(command.enabled)
             is BridgeCommand.SetSourceLang -> backend.setSourceLang(command.lang)
             is BridgeCommand.SetTargetLang -> backend.setTargetLang(command.lang)
+            is BridgeCommand.SetModelTier -> backend.setModelTier(command.tier)
             is BridgeCommand.Connect -> backend.connect(command.host, command.port)
             is BridgeCommand.Disconnect -> backend.disconnect()
             is BridgeCommand.Announce -> backend.announce()

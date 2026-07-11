@@ -35,7 +35,8 @@ class AudioEngine(
     private val player: AudioPlayer,
     private val codec: AudioCodec? = null,
     private val packetCollector: AudioPacketCollector? = null,
-    private val speechEngine: SpeechEngine? = null
+    private val speechEngine: SpeechEngine? = null,
+    var downlinkSttEnabled: Boolean = false,
 ) {
     private var isRecordingActive = false
 
@@ -96,6 +97,13 @@ class AudioEngine(
     fun onAudioPacketReceived(payload: ByteArray) {
         if (codec == null) return // No negotiated codec, drop packet
         player.playBuffer(payload)
+        // §3.4 (optional, opt-in): STT on downlink — transcribe the remote peer's speech.
+        // Enabled when downlinkSttEnabled is true AND speechEngine is available.
+        // Note: by design each peer transcribes its OWN speech; this is only for peers
+        // whose devices cannot run STT locally. Off by default.
+        if (downlinkSttEnabled && speechEngine?.isAvailable == true) {
+            speechEngine.feedPcm(Pcm.toShortArray(payload))
+        }
     }
 
     /**

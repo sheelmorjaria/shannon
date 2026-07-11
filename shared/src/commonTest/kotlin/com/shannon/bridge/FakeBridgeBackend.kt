@@ -14,6 +14,7 @@ class FakeBridgeBackend : BridgeBackend {
     var captionsEnabled: Boolean? = null; private set
     var speakTranslations: Boolean? = null; private set
     var sourceLang: String? = UNSET; private set
+    var modelTier: String? = null; private set
     var targetLang: String? = UNSET; private set
     var connected: Pair<String, Int>? = null; private set
     var disconnectCount = 0; private set
@@ -39,6 +40,7 @@ class FakeBridgeBackend : BridgeBackend {
     override fun setSpeakTranslations(enabled: Boolean) { speakTranslations = enabled }
     override fun setSourceLang(lang: String?) { sourceLang = lang }
     override fun setTargetLang(lang: String?) { targetLang = lang }
+    override fun setModelTier(tier: String) { modelTier = tier }
     override suspend fun connect(host: String, port: Int) { connected = host to port }
     override suspend fun disconnect() { disconnectCount++ }
     override suspend fun announce() { announceCount++ }

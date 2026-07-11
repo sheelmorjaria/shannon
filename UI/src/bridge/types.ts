@@ -49,6 +49,7 @@ export type BridgeCommand =
   | { method: 'captions.setSpeakTranslations'; params: { enabled: boolean } }
   | { method: 'captions.setSourceLang'; params: { lang: string | null } }
   | { method: 'captions.setTargetLang'; params: { lang: string | null } }
+  | { method: 'captions.setModelTier'; params: { tier: string } }
   | { method: 'network.connect'; params: { host: string; port: number } }
   | { method: 'network.disconnect'; params: Record<string, never> }
   | { method: 'network.announce'; params: Record<string, never> };

@@ -18,6 +18,7 @@ interface BridgeBackend {
     fun setSpeakTranslations(enabled: Boolean)
     fun setSourceLang(lang: String?)
     fun setTargetLang(lang: String?)
+    fun setModelTier(tier: String)
     suspend fun connect(host: String, port: Int)
     suspend fun disconnect()
     suspend fun announce()

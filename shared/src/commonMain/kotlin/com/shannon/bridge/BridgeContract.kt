@@ -16,6 +16,7 @@ object BridgeContract {
     const val METHOD_SET_SPEAK_TRANSLATIONS = "captions.setSpeakTranslations"
     const val METHOD_SET_SOURCE_LANG = "captions.setSourceLang"
     const val METHOD_SET_TARGET_LANG = "captions.setTargetLang"
+    const val METHOD_SET_MODEL_TIER = "captions.setModelTier"
     const val METHOD_CONNECT = "network.connect"
     const val METHOD_DISCONNECT = "network.disconnect"
     const val METHOD_ANNOUNCE = "network.announce"

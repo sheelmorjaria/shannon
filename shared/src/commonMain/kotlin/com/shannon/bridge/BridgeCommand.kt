@@ -18,6 +18,7 @@ sealed class BridgeCommand {
     @Serializable data class SetSpeakTranslations(val enabled: Boolean) : BridgeCommand()
     @Serializable data class SetSourceLang(val lang: String?) : BridgeCommand()
     @Serializable data class SetTargetLang(val lang: String?) : BridgeCommand()
+    @Serializable data class SetModelTier(val tier: String) : BridgeCommand()
     @Serializable data class Connect(val host: String, val port: Int) : BridgeCommand()
     @Serializable object Disconnect : BridgeCommand()
     @Serializable object Announce : BridgeCommand()
@@ -44,6 +45,8 @@ object BridgeCommandCodec {
             json.encodeToJsonElement(BridgeCommand.SetSourceLang.serializer(), command)
         is BridgeCommand.SetTargetLang -> BridgeContract.METHOD_SET_TARGET_LANG to
             json.encodeToJsonElement(BridgeCommand.SetTargetLang.serializer(), command)
+        is BridgeCommand.SetModelTier -> BridgeContract.METHOD_SET_MODEL_TIER to
+            json.encodeToJsonElement(BridgeCommand.SetModelTier.serializer(), command)
         is BridgeCommand.Connect -> BridgeContract.METHOD_CONNECT to
             json.encodeToJsonElement(BridgeCommand.Connect.serializer(), command)
         is BridgeCommand.Disconnect -> BridgeContract.METHOD_DISCONNECT to JsonObject(emptyMap())
@@ -60,6 +63,7 @@ object BridgeCommandCodec {
         BridgeContract.METHOD_SET_SPEAK_TRANSLATIONS -> json.decodeFromJsonElement(BridgeCommand.SetSpeakTranslations.serializer(), params)
         BridgeContract.METHOD_SET_SOURCE_LANG -> json.decodeFromJsonElement(BridgeCommand.SetSourceLang.serializer(), params)
         BridgeContract.METHOD_SET_TARGET_LANG -> json.decodeFromJsonElement(BridgeCommand.SetTargetLang.serializer(), params)
+        BridgeContract.METHOD_SET_MODEL_TIER -> json.decodeFromJsonElement(BridgeCommand.SetModelTier.serializer(), params)
         BridgeContract.METHOD_CONNECT -> json.decodeFromJsonElement(BridgeCommand.Connect.serializer(), params)
         BridgeContract.METHOD_DISCONNECT -> BridgeCommand.Disconnect
         BridgeContract.METHOD_ANNOUNCE -> BridgeCommand.Announce

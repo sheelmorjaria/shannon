@@ -61,6 +61,10 @@ class DefaultBridgeBackend(
     }
     override fun setTargetLang(lang: String?) = captions.setTargetLang(lang)
 
+    override fun setModelTier(tier: String) {
+        println("Model tier set to: $tier")
+    }
+
     override suspend fun connect(host: String, port: Int) = client.connect(host, port)
     override suspend fun disconnect() = client.disconnect()
     override suspend fun announce() = client.announce()

@@ -57,6 +57,7 @@ class BridgeServerLiveTest {
         override fun setSpeakTranslations(enabled: Boolean) {}
         override fun setSourceLang(lang: String?) {}
         override fun setTargetLang(lang: String?) {}
+        override fun setModelTier(tier: String) {}
         override suspend fun connect(host: String, port: Int) {}
         override suspend fun disconnect() {}
         override suspend fun announce() {}

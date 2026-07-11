@@ -419,3 +419,17 @@ cd UI && npm run build:desktop
 
 The window opens with the Shannon UI. The bridge starts automatically at app launch and stops on
 window close. For `npm run dev` (web-only development without the bridge), use MockBackend.
+
+## Live Captions & Translation (STT/TTS)
+
+On-device speech recognition via **Vosk** (`com.alphacephei:vosk`) — no cloud, no server.
+Each device transcribes its own microphone locally and sends only caption **text** to peers
+via the LXST `TRANSCRIPT` packet type. Raw audio never leaves the device.
+
+- **STT**: VoskSpeechEngine (real recognition, replacing the stub). Built-in VAD via
+  `acceptWaveForm` utterance boundary detection. Graceful degradation when no model is present.
+- **Model download**: `VoskModelManager.ensureModel()` downloads the small English model
+  (~40 MB) from alphacephei.com on first use, cached at `~/.shannon/vosk/`.
+- **TTS**: stub (returns empty PCM; needs a separate engine like Piper/Sherpa for synthesis).
+- **Browser audio**: the React UI captures mic PCM via Web Audio API and streams it as binary
+  WebSocket frames to the bridge → `VoskSpeechEngine.feedPcm` → transcription.

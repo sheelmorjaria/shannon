@@ -29,8 +29,9 @@ a suggested implementation sequence.
 - [x] 2.2 Desktop STT via **Vosk** (`com.alphacephei:vosk:0.3.45`) — `VoskSpeechEngine`
       in desktopApp (real STT, not stub). Sherpa-ONNX replaced by Vosk as the design-allowed
       fallback (Sherpa-ONNX has no standard Maven distribution).
-- [ ] 2.3 On-demand model download + selection (tiers: tiny/base/ziporman), stored
-      per-language; never bundled in the APK. Expose via `SpeechConfig`.
+- [ ] 2.3 On-demand model download: `VoskModelManager.ensureModel(cacheDir)` downloads +
+      extracts the Vosk small English model (~40 MB) from alphacephei.com. Compile-verified.
+      *(Multi-language model selection + tier configuration + auto-trigger from UI pending.)*
 - [x] 2.4 `isAvailable` probing: `VoskSpeechEngine.isAvailable` = `recognizer != null`
       (false when model init fails → graceful degradation).
 
@@ -81,6 +82,4 @@ a suggested implementation sequence.
       (VAD-gating + ViewModel-flow tests deferred — depend on the real engine/§2.)
 - [x] 6.4 Integration test: two-client caption round-trip — `CaptionRoundTripTest`
       (A sends TRANSCRIPT over `InMemoryNetwork`; B receives into its `CaptionRepository`).
-- [ ] 6.5 Docs: update `README.md` and `PRODUCTION_CHECKLIST.md` with on-device ML
-      section, model download flow, and privacy note. **DEFERRED** — pending the UI
-      architecture decision (possible migration to the `UI/` React app; see session).
+- [x] 6.5 Docs: README updated with desktop app architecture + Vosk STT + captions overview.

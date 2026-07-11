@@ -80,10 +80,8 @@ fun main() = application {
     bridge.start()
     println("Shannon bridge listening on ws://127.0.0.1:${BridgeServer.DEFAULT_PORT}/bridge")
 
-    val webUrl = System.getProperty("shannon.web.url") ?: listOf(
-        java.io.File("UI/dist/index.html"),
-        java.io.File("../UI/dist/index.html"),
-    ).firstOrNull { it.exists() }?.let { "file://${it.absolutePath}" } ?: "about:blank"
+    val webUrl = System.getProperty("shannon.web.url")
+        ?: "http://127.0.0.1:${BridgeServer.DEFAULT_PORT}/"
     println("Loading Shannon UI from $webUrl")
 
     Window(

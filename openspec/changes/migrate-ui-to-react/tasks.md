@@ -46,9 +46,9 @@
       `captions.setTargetLang` (none → null) / `captions.setSpeakTranslations` in both CallViews.
 
 ## 4. WebView shell
-- [ ] 4.1 Build `UI/` to `dist/` and bundle as a `desktopApp` resource.
-      (dist/ builds via `vite build`; build it with VITE_BRIDGE_URL=ws://127.0.0.1:47329/bridge
-      so the embedded app connects. Resource-bundling + ktor static serving not yet wired.)
+- [x] 4.1 Build `UI/` to `dist/` and bundle as a `desktopApp` resource.
+      (copyWebUi gradle task copies UI/dist → resources/web/; BridgeServer serves / and /assets/
+      via manual ktor routes from classpath. Main.kt loads http://127.0.0.1:PORT/.)
 - [x] 4.2 Embed an OS WebView in the Compose Desktop window.
       RESOLVED: restructured desktopApp from KMP `jvm("desktop")` to a plain
       `kotlin("jvm")` application — KGP's `KotlinDependencyHandler` had silently

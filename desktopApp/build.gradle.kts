@@ -39,3 +39,10 @@ compose.desktop {
 tasks.withType<Test> {
     useJUnitPlatform()
 }
+
+// §4.1: bundle the built React UI (UI/dist) into the app's resources so it ships in the JAR.
+tasks.register<Copy>("copyWebUi") {
+    from(rootProject.layout.projectDirectory.dir("UI/dist"))
+    into(layout.buildDirectory.dir("resources/main/web"))
+}
+tasks.named("processResources") { dependsOn("copyWebUi") }

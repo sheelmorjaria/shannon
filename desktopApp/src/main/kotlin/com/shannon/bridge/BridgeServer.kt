@@ -1,6 +1,9 @@
 package com.shannon.bridge
 
+import io.ktor.http.ContentType
 import io.ktor.server.application.install
+import io.ktor.server.response.respondText
+import io.ktor.server.routing.get
 import io.ktor.server.cio.CIO
 import io.ktor.server.cio.CIOApplicationEngine
 import io.ktor.server.engine.EmbeddedServer
@@ -37,6 +40,24 @@ class BridgeServer(
         val engine = embeddedServer(CIO, host = "127.0.0.1", port = port) {
             install(WebSockets)
             routing {
+                // Serve the bundled React UI from classpath resources (web/).
+                get("/") {
+                    val res = Thread.currentThread().contextClassLoader.getResource("web/index.html")
+                    if (res != null) call.respondText(res.readText(), ContentType.Text.Html)
+                    else call.respondText("UI not bundled. Run: cd UI && npm run build:desktop")
+                }
+                get("/assets/{file}") {
+                    val file = call.parameters["file"] ?: return@get
+                    val res = Thread.currentThread().contextClassLoader.getResource("web/assets/$file")
+                    if (res != null) {
+                        val ct = when {
+                            file.endsWith(".js") -> ContentType.Text.JavaScript
+                            file.endsWith(".css") -> ContentType.Text.CSS
+                            else -> ContentType.Application.OctetStream
+                        }
+                        call.respondText(res.readText(), ct)
+                    }
+                }
                 webSocket("/bridge") {
                     // Outbound: stream merged flow notifications as JSON-RPC notifications.
                     val outgoingJob = launch {

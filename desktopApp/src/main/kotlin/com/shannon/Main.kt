@@ -35,6 +35,7 @@ import com.shannon.viewmodel.ConnectivityViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import org.koin.core.context.startKoin
 import org.koin.dsl.module
 
@@ -77,13 +78,27 @@ fun main() = application {
     connectivityViewModel.startObserving()
 
     // Launch the localhost JSON-RPC bridge so the React UI (webview) can talk to the Kotlin core.
+    val voskCacheDir = java.io.File(System.getProperty("user.home"), ".shannon/vosk")
+    val voskEngine = com.shannon.speech.VoskSpeechEngine(
+        modelPath = System.getProperty("shannon.vosk.model")
+            ?: com.shannon.speech.VoskModelManager.ensureModel(
+                com.shannon.speech.VoskModelManager.DEFAULT_LANG, voskCacheDir,
+            ) ?: "vosk-model-small-en-us-0.15",
+    )
+    val scope = koin.get<CoroutineScope>()
     val backend = DefaultBridgeBackend(
         messages = koin.get(),
         client = koin.get(),
         calls = koin.get(),
         captions = koin.get(),
-        speech = koin.get(),
+        speech = voskEngine,
         localHash = LOCAL_HASH,
+        onLanguageChanged = { lang ->
+            scope.launch {
+                val path = com.shannon.speech.VoskModelManager.ensureModel(lang, voskCacheDir)
+                if (path != null) voskEngine.switchLanguage(lang, path)
+            }
+        },
     )
     val bridge = BridgeServer(backend)
     bridge.start()

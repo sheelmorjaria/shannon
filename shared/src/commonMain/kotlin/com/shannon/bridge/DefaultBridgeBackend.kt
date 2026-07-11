@@ -31,6 +31,7 @@ class DefaultBridgeBackend(
     private val captions: CaptionViewModel,
     private val speech: SpeechEngine,
     private val localHash: String,
+    private val onLanguageChanged: ((String) -> Unit)? = null,
 ) : BridgeBackend {
 
     private val selectedContact = MutableStateFlow<String?>(null)
@@ -54,7 +55,10 @@ class DefaultBridgeBackend(
 
     override fun setCaptionsEnabled(enabled: Boolean) = captions.setCaptionsEnabled(enabled)
     override fun setSpeakTranslations(enabled: Boolean) = captions.setSpeakTranslations(enabled)
-    override fun setSourceLang(lang: String?) = captions.setSourceLang(lang)
+    override fun setSourceLang(lang: String?) {
+        captions.setSourceLang(lang)
+        if (lang != null) onLanguageChanged?.invoke(lang)
+    }
     override fun setTargetLang(lang: String?) = captions.setTargetLang(lang)
 
     override suspend fun connect(host: String, port: Int) = client.connect(host, port)

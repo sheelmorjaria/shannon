@@ -11,53 +11,80 @@ import org.vosk.Recognizer
  * ([isAvailable] = false) if the model isn't found or native libs fail to load.
  * TTS returns empty (Vosk is STT-only; TTS needs a separate engine like Piper/Sherpa).
  *
- * Replaces the design's primary Sherpa-ONNX with Vosk as the design-allowed fallback,
- * because Sherpa-ONNX has no standard Maven distribution (GitHub Releases only).
+ * Use [switchLanguage] to swap models at runtime (triggered by per-language download via
+ * [VoskModelManager]). Thread-safe via a synchronized lock around [feedPcm] / [switchLanguage].
  */
 class VoskSpeechEngine(
-    private val modelPath: String,
+    private var modelPath: String,
 ) : SpeechEngine {
+    private val lock = Any()
     private var model: Model? = null
     private var recognizer: Recognizer? = null
     private var callback: ((Transcript) -> Unit)? = null
     private var seq = 0L
+    private var currentLang = VoskModelManager.DEFAULT_LANG
 
-    override val isAvailable: Boolean get() = recognizer != null
+    override val isAvailable: Boolean get() = synchronized(lock) { recognizer != null }
 
     override fun startStt(onTranscript: (Transcript) -> Unit) {
         callback = onTranscript
         seq = 0
-        try {
-            LibVosk.setLogLevel(LogLevel.WARNINGS)
-            model = Model(modelPath)
-            recognizer = Recognizer(model, 16000f)
-        } catch (e: Exception) {
-            println("Vosk init failed (model at '$modelPath'): ${e.message}")
+        synchronized(lock) {
+            try {
+                LibVosk.setLogLevel(LogLevel.WARNINGS)
+                model = Model(modelPath)
+                recognizer = Recognizer(model, 16000f)
+            } catch (e: Exception) {
+                println("Vosk init failed (model at '$modelPath'): ${e.message}")
+            }
         }
     }
 
     override fun feedPcm(samples: ShortArray) {
-        val rec = recognizer ?: return
-        val bytes = Pcm.toByteArray(samples)
-        if (rec.acceptWaveForm(bytes, bytes.size)) {
-            val text = extractField(rec.result, "text")
-            if (text.isNotBlank()) {
-                callback?.invoke(Transcript(text, "en", isFinal = true, seq = seq++))
+        synchronized(lock) {
+            val rec = recognizer ?: return
+            val bytes = Pcm.toByteArray(samples)
+            if (rec.acceptWaveForm(bytes, bytes.size)) {
+                val text = extractField(rec.result, "text")
+                if (text.isNotBlank()) {
+                    callback?.invoke(Transcript(text, currentLang, isFinal = true, seq = seq++))
+                }
+            } else {
+                val partial = extractField(rec.partialResult, "partial")
+                if (partial.isNotBlank()) {
+                    callback?.invoke(Transcript(partial, currentLang, isFinal = false, seq = seq))
+                }
             }
-        } else {
-            val partial = extractField(rec.partialResult, "partial")
-            if (partial.isNotBlank()) {
-                callback?.invoke(Transcript(partial, "en", isFinal = false, seq = seq))
+        }
+    }
+
+    /** Switch to a different language model at runtime. Downloads the model first via [VoskModelManager]. */
+    fun switchLanguage(lang: String, newModelPath: String) {
+        synchronized(lock) {
+            recognizer?.close()
+            model?.close()
+            currentLang = lang
+            modelPath = newModelPath
+            try {
+                model = Model(newModelPath)
+                recognizer = Recognizer(model, 16000f)
+                println("Vosk switched to language '$lang' (model: $newModelPath)")
+            } catch (e: Exception) {
+                recognizer = null
+                model = null
+                println("Vosk language switch to '$lang' failed: ${e.message}")
             }
         }
     }
 
     override fun stopStt() {
-        recognizer?.close()
-        model?.close()
-        recognizer = null
-        model = null
-        callback = null
+        synchronized(lock) {
+            recognizer?.close()
+            model?.close()
+            recognizer = null
+            model = null
+            callback = null
+        }
     }
 
     override fun synthesize(text: String, lang: String): ShortArray = ShortArray(0)

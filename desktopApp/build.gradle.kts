@@ -31,7 +31,8 @@ dependencies {
     implementation("org.openjfx:javafx-swing:21:$osClassifier")
     // Vosk on-device STT (§2.2): real speech recognition replacing the stub engine.
     // Model files are provided at runtime (downloaded separately to the modelPath).
-    implementation(libs.vosk)
+    // Sherpa-ONNX Java API (non-transitive — the artifact's POM pulls conflicting deps)
+    implementation("com.litongjava:sherpa-onnx-java-api:1.0.1") { isTransitive = false }
 
     testImplementation(libs.kotlin.test)
     testImplementation(libs.kotlinx.coroutines.core)

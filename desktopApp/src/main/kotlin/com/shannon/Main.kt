@@ -61,11 +61,10 @@ fun main() = application {
             voiceCallModule(),
             captionModule(),
             module {
-                // Override the stub SpeechEngine with real Vosk STT (§2.2). Falls back gracefully
-                // if the model isn't found (isAvailable = false → captions disabled).
+                // Override the stub SpeechEngine with Sherpa-ONNX (STT + TTS + VAD).
                 single<com.shannon.speech.SpeechEngine> {
-                    com.shannon.speech.VoskSpeechEngine(
-                        modelPath = System.getProperty("shannon.vosk.model") ?: "vosk-model-en",
+                    com.shannon.speech.SherpaSpeechEngine(
+                        cacheDir = java.io.File(System.getProperty("user.home"), ".shannon/sherpa"),
                     )
                 }
             },
@@ -78,25 +77,20 @@ fun main() = application {
     connectivityViewModel.startObserving()
 
     // Launch the localhost JSON-RPC bridge so the React UI (webview) can talk to the Kotlin core.
-    val voskCacheDir = java.io.File(System.getProperty("user.home"), ".shannon/vosk")
-    val voskEngine = com.shannon.speech.VoskSpeechEngine(
-        modelPath = System.getProperty("shannon.vosk.model")
-            ?: com.shannon.speech.VoskModelManager.ensureModel(
-                com.shannon.speech.VoskModelManager.DEFAULT_LANG, voskCacheDir,
-            ) ?: "vosk-model-small-en-us-0.15",
-    )
+    val sherpaCacheDir = java.io.File(System.getProperty("user.home"), ".shannon/sherpa")
+    val sherpaEngine = com.shannon.speech.SherpaSpeechEngine(sherpaCacheDir)
     val scope = koin.get<CoroutineScope>()
     val backend = DefaultBridgeBackend(
         messages = koin.get(),
         client = koin.get(),
         calls = koin.get(),
         captions = koin.get(),
-        speech = voskEngine,
+        speech = sherpaEngine,
         localHash = LOCAL_HASH,
         onLanguageChanged = { lang ->
             scope.launch {
-                val path = com.shannon.speech.VoskModelManager.ensureModel(lang, voskCacheDir)
-                if (path != null) voskEngine.switchLanguage(lang, path)
+                val models = com.shannon.speech.SherpaModelManager.ensureModels(lang, sherpaCacheDir)
+                if (models != null) sherpaEngine.switchLanguage(lang, models)
             }
         },
     )

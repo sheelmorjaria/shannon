@@ -113,3 +113,8 @@ proguard/
 
 # Exported health metrics
 service_health_metrics_*.txt
+# JavaScript / React UI (UI/)
+node_modules/
+UI/dist/
+UI/.vite/
+*.tsbuildinfo

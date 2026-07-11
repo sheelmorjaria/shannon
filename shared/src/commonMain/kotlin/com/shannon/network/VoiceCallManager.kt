@@ -66,6 +66,7 @@ class VoiceCallManager(
                 }
             }
             LxstPacketType.AUDIO -> { /* handled by audio pipeline */ }
+            LxstPacketType.TRANSCRIPT -> { /* handled by the caption pipeline via observeIncomingLxstPackets */ }
         }
     }
 

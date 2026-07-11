@@ -1,0 +1,33 @@
+# OpenSpec project configuration — Shannon
+# Tool: @fission-ai/openspec (spec-driven schema)
+# Recognized fields: schema (string), context (single string, <=50KB),
+#                    rules (artifact -> [strings]), references (store refs)
+
+schema: spec-driven
+
+context: |
+  Shannon is a production-grade, decentralized, SERVERLESS messenger built on the
+  Reticulum network. Kotlin Multiplatform: modules `shared` (source sets
+  commonMain / androidMain / desktopMain), `androidApp`, `desktopApp`. UI: Compose
+  Multiplatform. DI: Koin. Persistence: SQLDelight. Networking is fully P2P and
+  E2EE via LXMF (async messaging) and LXST (real-time voice signaling) — there is
+  NO server, NO SFU, NO media relay. The voice path lives in `AudioEngine`
+  (Mic -> AudioRecorder -> PCM -> LxstPacket(AUDIO) -> ReticulumClient on the
+  uplink; downlink via AudioPlayer.playBuffer). Audio codecs Opus / AMR-WB /
+  CODEC2 exist only for low-bandwidth transmission; STT runs on raw PCM.
+  The STT/TTS change is ON-DEVICE via Sherpa-ONNX; captions travel as LXST
+  TRANSCRIPT text. Do NOT reintroduce any server / SFU / gRPC / cloud ML.
+
+rules:
+  proposal:
+    - "State Why, What Changes, Capabilities, Impact, and Non-Goals."
+    - "All architecture must respect Shannon's serverless/P2P model — no SFU, no backend, no cloud ML."
+  specs:
+    - "Use 'Requirement:' prefixes for testable statements."
+    - "Categorize by Functional (FR) or Non-Functional (NFR)."
+  design:
+    - "Reference real Shannon symbols (AudioEngine, ReticulumClient, LxstPacketType, AppModule)."
+    - "State latency targets per device class; separate compute latency from link delivery."
+  tasks:
+    - "Group tasks by Shannon module (commonMain, androidMain, desktopMain, network, UI, build/DI)."
+    - "Reference real files/symbols where possible."

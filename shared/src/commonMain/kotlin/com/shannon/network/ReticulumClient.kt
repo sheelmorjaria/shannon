@@ -85,5 +85,6 @@ enum class LxstPacketType {
     REJECT,     // Call rejected
     BUSY,       // Destination busy
     HANGUP,     // Call ended
-    AUDIO       // Audio data
+    AUDIO,      // Audio data
+    TRANSCRIPT  // Caption/translation text (JSON CaptionPayload)
 }

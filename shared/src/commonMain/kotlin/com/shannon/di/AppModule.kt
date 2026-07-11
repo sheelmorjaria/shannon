@@ -68,7 +68,8 @@ fun voiceCallModule() = module {
         recorder = get(),
         player = get(),
         codec = getOrNull(),
-        packetCollector = getOrNull()
+        packetCollector = getOrNull(),
+        speechEngine = getOrNull()
     )}
 
     // Voice Call Manager with audio integration
@@ -78,4 +79,19 @@ fun voiceCallModule() = module {
         audioEngine = get(),
         scope = get<CoroutineScope>()
     )}
+}
+
+/**
+ * Caption / on-device STT-TTS module. Binds a stub [com.shannon.speech.SpeechEngine]
+ * (graceful degradation) until the real Sherpa-ONNX platform implementations (§2) land.
+ * Provides caption transport over Reticulum and the captions view model.
+ */
+fun captionModule() = module {
+    single<com.shannon.domain.repository.CaptionRepository> {
+        com.shannon.caption.InMemoryCaptionRepository()
+    }
+    single<com.shannon.speech.SpeechEngine> { com.shannon.speech.StubSpeechEngine() }
+    single<com.shannon.speech.SpeechEngineProvider> { com.shannon.speech.StubSpeechEngineProvider() }
+    single { com.shannon.caption.CaptionTransport(get(), get()) }
+    factory { com.shannon.viewmodel.CaptionViewModel(get(), get(), get<CoroutineScope>()) }
 }

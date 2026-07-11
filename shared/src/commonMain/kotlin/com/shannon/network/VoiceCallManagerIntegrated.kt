@@ -92,6 +92,9 @@ class VoiceCallManagerIntegrated(
                     }
                 }
             }
+            LxstPacketType.TRANSCRIPT -> {
+                // Captions are routed by the caption pipeline via observeIncomingLxstPackets.
+            }
         }
     }
 

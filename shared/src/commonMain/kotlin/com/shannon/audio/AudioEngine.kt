@@ -3,6 +3,7 @@ package com.shannon.audio
 import com.shannon.network.AudioCodec
 import com.shannon.network.LxstPacket
 import com.shannon.network.LxstPacketType
+import com.shannon.speech.SpeechEngine
 
 /**
  * Result of an audio engine operation.
@@ -33,7 +34,8 @@ class AudioEngine(
     private val recorder: AudioRecorder,
     private val player: AudioPlayer,
     private val codec: AudioCodec? = null,
-    private val packetCollector: AudioPacketCollector? = null
+    private val packetCollector: AudioPacketCollector? = null,
+    private val speechEngine: SpeechEngine? = null
 ) {
     private var isRecordingActive = false
 
@@ -109,5 +111,10 @@ class AudioEngine(
                 payload = buffer
             )
         )
+        // Feed raw PCM to the on-device STT engine (task 3.1). feedPcm must be non-blocking
+        // (buffering only); VAD + inference run inside the engine off this thread (NFR).
+        if (speechEngine?.isAvailable == true) {
+            speechEngine.feedPcm(Pcm.toShortArray(buffer))
+        }
     }
 }

@@ -393,3 +393,29 @@ See [PROJECT_SUMMARY.md](PROJECT_SUMMARY.md) for complete achievement overview.
 **[⬆ Back to Top](#shannon)**
 
 </div>
+
+## Desktop App: React UI + Local Bridge
+
+The desktop app embeds a **React UI** (Vite + TypeScript + Tailwind) in a JavaFX WebView inside
+the Compose Desktop window. The React UI communicates with the Kotlin core over a **localhost
+WebSocket** (JSON-RPC 2.0) — no remote server; the bridge is local IPC.
+
+### Architecture
+```
+Compose Desktop → JavaFX WebView → React UI (UI/dist)
+                                    ↕ ws://127.0.0.1:47329/bridge
+                                BridgeServer → DefaultBridgeBackend
+                                    → Kotlin core (Reticulum, AudioEngine, captions)
+```
+
+### Build & Run
+```bash
+# 1. Build the React UI for the desktop WebView (relative paths + bridge URL baked in):
+cd UI && npm run build:desktop
+
+# 2. Run the desktop app:
+./gradlew :desktopApp:run
+```
+
+The window opens with the Shannon UI. The bridge starts automatically at app launch and stops on
+window close. For `npm run dev` (web-only development without the bridge), use MockBackend.

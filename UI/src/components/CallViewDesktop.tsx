@@ -5,11 +5,13 @@ import VideoTile from './VideoTile'
 import ControlBar from './ControlBar'
 import LiveCaptionBar from './LiveCaptionBar'
 import LanguageSelector from './LanguageSelector'
+import type { Backend } from '../bridge/backend'
 
 const MY_LANGUAGE = LANGUAGES.find(l => l.code === 'en')!
 
 type Props = {
   callState: CallState
+  backend: Backend | null
   onEnd: () => void
   onMute: () => void
   onCamera: () => void
@@ -17,7 +19,7 @@ type Props = {
   onTranslation: () => void
 }
 
-export default function CallViewDesktop({ callState, onEnd, onMute, onCamera, onCaptions, onTranslation }: Props) {
+export default function CallViewDesktop({ callState, backend, onEnd, onMute, onCamera, onCaptions, onTranslation }: Props) {
   const [duration, setDuration] = useState(0)
   const [chatOpen, setChatOpen] = useState(false)
   const [langSelectorOpen, setLangSelectorOpen] = useState(false)
@@ -48,6 +50,9 @@ export default function CallViewDesktop({ callState, onEnd, onMute, onCamera, on
       setTranslatedText('')
       return
     }
+    // When a real backend is connected, captions arrive via captions.updated (see effect below);
+    // skip the demo CAPTION_SAMPLES cycle.
+    if (backend) return
 
     function runCaptionCycle() {
       const sample = CAPTION_SAMPLES[captionIdx.current % CAPTION_SAMPLES.length]
@@ -99,7 +104,21 @@ export default function CallViewDesktop({ callState, onEnd, onMute, onCamera, on
     return () => {
       if (captionTimer.current) clearTimeout(captionTimer.current)
     }
-  }, [callState.captionsEnabled, callState.translationEnabled, ttsEnabled])
+  }, [callState.captionsEnabled, callState.translationEnabled, ttsEnabled, backend])
+
+  // §3.4: real captions from the bridge drive the display when a backend is connected.
+  useEffect(() => {
+    if (!backend) return
+    return backend.on('captions.updated', (p) => {
+      const latest = p.captions[p.captions.length - 1]
+      if (!latest) return
+      setSttState('showing')
+      setCaptionText(latest.text)
+      setTranslatedText(latest.translated ?? '')
+      const lang = LANGUAGES.find(l => l.code === latest.lang)
+      if (lang) setDetectedLanguage(lang)
+    })
+  }, [backend])
 
   function formatDuration(s: number) {
     const m = Math.floor(s / 60).toString().padStart(2, '0')
@@ -295,6 +314,9 @@ export default function CallViewDesktop({ callState, onEnd, onMute, onCamera, on
             setSpeakingLang(sp)
             setTranslateTo(tr)
             setTtsEnabled(t)
+            backend?.send({ method: 'captions.setSourceLang', params: { lang: sp.code === 'auto' ? null : sp.code } }).catch(() => {})
+            backend?.send({ method: 'captions.setTargetLang', params: { lang: tr.code === 'none' ? null : tr.code } }).catch(() => {})
+            backend?.send({ method: 'captions.setSpeakTranslations', params: { enabled: t } }).catch(() => {})
           }}
           onClose={() => setLangSelectorOpen(false)}
         />

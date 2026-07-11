@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useBackend } from './bridge/useBackend'
 import { CONTACTS, MESSAGES, LANGUAGES, type Contact, type Message, type CallState } from './data'
 import Sidebar from './components/Sidebar'
 import ConversationList from './components/ConversationList'
@@ -26,6 +27,8 @@ export default function App() {
     speakingLevel: 0,
   })
 
+  const { backend, connectionStatus } = useBackend()
+
   function sendMessage(contactId: string, content: string) {
     const msg: Message = {
       id: `m-${Date.now()}`, contactId, direction: 'out', content,
@@ -39,6 +42,12 @@ export default function App() {
         [contactId]: prev[contactId].map(m => m.id === msg.id ? { ...m, status: 'delivered' } : m),
       }))
     }, 1200)
+
+    // Hybrid wiring (§3.3): fire the real bridge send alongside the optimistic local update.
+    const contact = CONTACTS.find(c => c.id === contactId)
+    if (contact) {
+      backend?.send({ method: 'message.send', params: { destinationHash: contact.lxmfAddress, content } }).catch(() => {})
+    }
   }
 
   function startCall(contact: Contact) {
@@ -53,8 +62,16 @@ export default function App() {
     onEnd: endCall,
     onMute: () => setCallState(prev => ({ ...prev, muted: !prev.muted })),
     onCamera: () => setCallState(prev => ({ ...prev, cameraOff: !prev.cameraOff })),
-    onCaptions: () => setCallState(prev => ({ ...prev, captionsEnabled: !prev.captionsEnabled })),
-    onTranslation: () => setCallState(prev => ({ ...prev, translationEnabled: !prev.translationEnabled })),
+    onCaptions: () => setCallState(prev => {
+      const next = !prev.captionsEnabled
+      backend?.send({ method: 'captions.setEnabled', params: { enabled: next } }).catch(() => {})
+      return { ...prev, captionsEnabled: next }
+    }),
+    onTranslation: () => setCallState(prev => {
+      const next = !prev.translationEnabled
+      backend?.send({ method: 'captions.setSpeakTranslations', params: { enabled: next } }).catch(() => {})
+      return { ...prev, translationEnabled: next }
+    }),
   }
 
   const isMobile = deviceMode === 'mobile'
@@ -145,8 +162,8 @@ export default function App() {
 
         {/* Network badge */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: '#6B7280', fontFamily: 'var(--font-mono)' }}>
-          <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10B981', boxShadow: '0 0 4px #10B981', animation: 'stt-blink 3s infinite' }} />
-          RETICULUM · 4 nodes
+          <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: connectionStatus === 'CONNECTED' ? '#10B981' : '#6B7280', boxShadow: connectionStatus === 'CONNECTED' ? '0 0 4px #10B981' : 'none' }} />
+          RETICULUM · {connectionStatus}
         </div>
       </div>
 
@@ -202,9 +219,9 @@ export default function App() {
       {/* ── Active call overlays ── */}
       {callState.active && callState.contact && (
         deviceMode === 'desktop' ? (
-          <CallViewDesktop callState={callState} {...callHandlers} />
+          <CallViewDesktop callState={callState} backend={backend} {...callHandlers} />
         ) : (
-          <CallViewMobile callState={callState} {...callHandlers} />
+          <CallViewMobile callState={callState} backend={backend} {...callHandlers} />
         )
       )}
     </div>

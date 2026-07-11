@@ -3,7 +3,9 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import path from 'node:path'
 
-import siteConfiguration from './.figma/make/site.json'
+// .figma/make/site.json is a Figma-Make artifact not shipped in this repo. Default to an empty
+// config so the app builds/runs standalone — the site-config plugin below falls back to defaults.
+const siteConfiguration: FigmaSiteConfiguration = {}
 
 const isFigmaSandbox = process.env.FIGMA === '1' || process.env.FIGMA === 'true'
 

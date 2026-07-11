@@ -1,6 +1,6 @@
 package com.shannon.db
 
-import app.cash.sqldelight.driver.jdbc.JdbcSqliteDriver
+import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -124,10 +124,7 @@ class DatabaseMigrationTest {
 
         // Verify data still exists
         val messages = database.messageQueries.selectByContact(
-            contactHash = "contact_1",
-            contactHash = "contact_1",
-            limit = 10,
-            offset = 0
+            "contact_1", "contact_1", 10L, 0L
         ).executeAsList()
 
         assertTrue(messages.isNotEmpty(), "Messages should be preserved")
@@ -145,7 +142,7 @@ class DatabaseMigrationTest {
         val database = createInMemoryDatabase()
 
         // Simulate existing database with old metadata
-        database.databaseMetadataQueries.setDatabaseVersion("0")
+        database.databaseSchemaQueries.setDatabaseVersion("0")
 
         val migrationManager = DatabaseMigrationManager(database)
         val currentVersion = migrationManager.getCurrentVersion()
@@ -229,10 +226,7 @@ class DatabaseMigrationTest {
 
         // Verify relationships still work
         val messages = database.messageQueries.selectByContact(
-            contactHash = contactHash,
-            contactHash = contactHash,
-            limit = 10,
-            offset = 0
+            contactHash, contactHash, 10L, 0L
         ).executeAsList()
 
         assertTrue(messages.isNotEmpty(), "Messages should still be queryable by contact")
@@ -271,10 +265,7 @@ class DatabaseMigrationTest {
 
         // Verify all data is preserved
         val messages = database.messageQueries.selectByContact(
-            contactHash = "bulk_contact",
-            contactHash = "bulk_contact",
-            limit = messageCount + 10,
-            offset = 0
+            "bulk_contact", "bulk_contact", (messageCount + 10).toLong(), 0L
         ).executeAsList()
 
         assertEquals(messageCount, messages.size, "All messages should be preserved")

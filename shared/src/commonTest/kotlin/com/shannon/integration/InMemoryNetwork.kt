@@ -149,4 +149,8 @@ class InMemoryClient(
     override suspend fun disconnect() {
         statusFlow.value = ConnectionStatus.DISCONNECTED
     }
+
+    override fun getLocalIdentityHash(): String? = localHash
+
+    override fun getConnectionInfo(): com.shannon.network.ConnectionInfo? = null
 }

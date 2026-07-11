@@ -30,6 +30,7 @@ kotlin {
             implementation(libs.kotlinx.coroutines.test)
             implementation(libs.turbine)
             implementation(libs.koin.test)
+            implementation(libs.sqldelight.jdbc.driver)
         }
 
         val desktopMain by getting {
@@ -69,6 +70,13 @@ configurations.all {
         cacheDynamicVersionsFor(10, "minutes")
         cacheChangingModulesFor(10, "minutes")
     }
+}
+
+// The JitPack 'reticulum-kt' snapshot transitively pulls 'rns-android' (an Android AAR),
+// which the desktop (JVM) target cannot consume. Keep Android-only artifacts off JVM
+// classpaths so desktopTest/desktopCompile resolve. (Pre-existing snapshot breakage.)
+configurations.matching { it.name.contains("desktop", ignoreCase = true) }.configureEach {
+    exclude(group = "com.github.torlando-tech.reticulum-kt", module = "rns-android")
 }
 
 sqldelight {

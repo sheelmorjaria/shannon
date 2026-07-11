@@ -22,7 +22,7 @@ class SqlDelightMessageRepositoryTest {
     ): SqlDelightMessageRepository {
         val driver = JdbcSqliteDriver(JdbcSqliteDriver.IN_MEMORY)
         ShannonDatabase.Schema.create(driver)
-        return SqlDelightMessageRepository(ShannonDatabase(driver), client, localHash, testScope)
+        return SqlDelightMessageRepository(ShannonDatabase(driver), localHash, testScope)
     }
 
     @Test
@@ -131,7 +131,7 @@ class SqlDelightMessageRepositoryTest {
     fun `incoming packets are persisted`() = runTest {
         val client = FakeReticulumClient()
         val repo = createRepo(client, this)
-        repo.startListening()
+        repo.startListening(client)
 
         client.simulateIncomingLxmf(
             com.shannon.network.LxmfPacket(
@@ -155,10 +155,9 @@ class SqlDelightMessageRepositoryTest {
         val driver = JdbcSqliteDriver(JdbcSqliteDriver.IN_MEMORY)
         ShannonDatabase.Schema.create(driver)
         val db = ShannonDatabase(driver)
-        val client = FakeReticulumClient()
 
         // Save with first instance
-        val repo1 = SqlDelightMessageRepository(db, client, localHash, this)
+        val repo1 = SqlDelightMessageRepository(db, localHash, this)
         repo1.saveMessage(Message(
             destinationHash = remoteHash,
             content = "Persistent",
@@ -167,7 +166,7 @@ class SqlDelightMessageRepositoryTest {
         ))
 
         // Create new instance with same database
-        val repo2 = SqlDelightMessageRepository(db, client, localHash, this)
+        val repo2 = SqlDelightMessageRepository(db, localHash, this)
         val messages = repo2.getMessages(remoteHash)
         assertEquals(1, messages.size)
         assertEquals("Persistent", messages[0].content)

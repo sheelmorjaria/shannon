@@ -67,6 +67,10 @@ class FakeReticulumClient : ReticulumClient {
         _status.value = ConnectionStatus.DISCONNECTED
     }
 
+    override fun getLocalIdentityHash(): String? = null
+
+    override fun getConnectionInfo(): ConnectionInfo? = null
+
     // --- Test helpers ---
 
     /** Simulate an incoming LXMF packet. */

@@ -4,6 +4,7 @@ import app.cash.turbine.test
 import com.shannon.domain.model.Message
 import com.shannon.domain.model.MessageState
 import com.shannon.domain.repository.MessageRepository
+import com.shannon.network.LxmfPacket
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -55,6 +56,10 @@ class FakeMessageRepository : MessageRepository {
         return message.transitionTo(MessageState.QUEUED)
             .transitionTo(MessageState.SENDING)
             .transitionTo(MessageState.SENT)
+    }
+
+    override suspend fun handleIncomingPacket(packet: LxmfPacket) {
+        // No-op: ViewModel tests do not exercise incoming-packet handling.
     }
 
     /** Simulate a message appearing in the contact's message list. */

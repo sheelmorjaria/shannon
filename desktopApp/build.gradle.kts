@@ -29,6 +29,9 @@ dependencies {
     implementation("org.openjfx:javafx-web:21:$osClassifier")
     implementation("org.openjfx:javafx-media:21:$osClassifier")
     implementation("org.openjfx:javafx-swing:21:$osClassifier")
+    // Vosk on-device STT (§2.2): real speech recognition replacing the stub engine.
+    // Model files are provided at runtime (downloaded separately to the modelPath).
+    implementation(libs.vosk)
 
     testImplementation(libs.kotlin.test)
     testImplementation(libs.kotlinx.coroutines.core)

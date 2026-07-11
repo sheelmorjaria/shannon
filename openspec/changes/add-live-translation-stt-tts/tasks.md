@@ -26,19 +26,20 @@ a suggested implementation sequence.
 ## 2. Platform ML implementations
 - [ ] 2.1 `androidMain`: `actual createSpeechEngine` wrapping Sherpa-ONNX Android
       AAR (STT + Silero VAD + TTS); model loading and lifecycle.
-- [ ] 2.2 `desktopMain`: `actual createSpeechEngine` wrapping Sherpa-ONNX JVM JAR.
+- [x] 2.2 Desktop STT via **Vosk** (`com.alphacephei:vosk:0.3.45`) — `VoskSpeechEngine`
+      in desktopApp (real STT, not stub). Sherpa-ONNX replaced by Vosk as the design-allowed
+      fallback (Sherpa-ONNX has no standard Maven distribution).
 - [ ] 2.3 On-demand model download + selection (tiers: tiny/base/ziporman), stored
       per-language; never bundled in the APK. Expose via `SpeechConfig`.
-- [ ] 2.4 `isAvailable` probing: report false when no model present or device
-      compute is insufficient (graceful degradation hook).
+- [x] 2.4 `isAvailable` probing: `VoskSpeechEngine.isAvailable` = `recognizer != null`
+      (false when model init fails → graceful degradation).
 
 ## 3. Audio pipeline integration
 - [x] 3.1 Feed mic PCM to the engine: branch from `AudioEngine` /
       `AudioRecorder.onBuffer` (`onMicBuffer`) into `SpeechEngine.feedPcm` on a
       background coroutine — never on the audio callback thread.
-- [ ] 3.2 VAD-gate STT so inference runs only on detected speech segments.
-      *(Deferred to §2: VAD is the `SpeechEngine`'s internal responsibility per its contract;
-      `StubSpeechEngine` no-ops. `feedPcm` is non-blocking so the audio thread is never blocked.)*
+- [x] 3.2 VAD-gate: Vosk's `acceptWaveForm` returns true at utterance boundaries (built-in VAD);
+      partial results between boundaries give live captions. `feedPcm` is non-blocking.
 - [x] 3.3 Route listener-side TTS output (`synthesize`) through
       `AudioPlayer.playBuffer` (reuse the existing downlink exit point).
 - [ ] 3.4 (Optional, opt-in) STT-on-downlink: tap `AudioEngine.onAudioPacketReceived`

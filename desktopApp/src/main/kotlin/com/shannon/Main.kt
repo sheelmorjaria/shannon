@@ -59,6 +59,15 @@ fun main() = application {
             networkModule(),
             voiceCallModule(),
             captionModule(),
+            module {
+                // Override the stub SpeechEngine with real Vosk STT (§2.2). Falls back gracefully
+                // if the model isn't found (isAvailable = false → captions disabled).
+                single<com.shannon.speech.SpeechEngine> {
+                    com.shannon.speech.VoskSpeechEngine(
+                        modelPath = System.getProperty("shannon.vosk.model") ?: "vosk-model-en",
+                    )
+                }
+            },
         )
     }.koin
 

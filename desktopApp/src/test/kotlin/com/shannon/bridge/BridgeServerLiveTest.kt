@@ -60,6 +60,7 @@ class BridgeServerLiveTest {
         override suspend fun connect(host: String, port: Int) {}
         override suspend fun disconnect() {}
         override suspend fun announce() {}
+        override fun feedAudioPcm(samples: ShortArray) {}
         override fun observeMessages() = flowOf(emptyList<MessageDto>())
         override fun observeCaptions() = flowOf(emptyList<CaptionDto>())
         override fun observeConnectionStatus() = flowOf(ConnectionStatusDto.DISCONNECTED)

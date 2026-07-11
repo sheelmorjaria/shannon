@@ -23,6 +23,7 @@ dependencies {
     implementation("org.openjfx:javafx-graphics:21:linux")
     implementation("org.openjfx:javafx-controls:21:linux")
     implementation("org.openjfx:javafx-web:21:linux")
+    implementation("org.openjfx:javafx-media:21:linux")
     implementation("org.openjfx:javafx-swing:21:linux")
 
     testImplementation(libs.kotlin.test)

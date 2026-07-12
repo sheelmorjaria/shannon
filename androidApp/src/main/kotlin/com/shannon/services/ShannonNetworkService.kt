@@ -140,15 +140,8 @@ class ShannonNetworkService : Service() {
      */
     private fun cleanupNetworkClient() {
         notificationJob?.cancel()
-        serviceScope.launch {
-            try {
-                if (reticulumClient is ReticulumClientImpl) {
-                    (reticulumClient as ReticulumClientImpl).cleanup()
-                }
-            } catch (e: Exception) {
-                // Log error but don't crash during cleanup
-            }
-        }
+        // ReticulumClientImpl exposes no explicit teardown hook today; its lifecycle is owned
+        // by the Koin scope. Service-level cleanup just marks us uninitialized.
         isServiceInitialized = false
     }
 

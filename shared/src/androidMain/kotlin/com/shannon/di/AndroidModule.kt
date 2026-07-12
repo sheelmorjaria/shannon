@@ -1,6 +1,7 @@
 package com.shannon.di
 
 import android.content.Context
+import com.shannon.appContext
 import com.shannon.db.DatabaseDriverFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -16,10 +17,8 @@ val androidModule = module {
     // Provide Android Context
     single { androidContext() }
 
-    // Provide Android-specific DatabaseDriverFactory
-    single<DatabaseDriverFactory> {
-        DatabaseDriverFactory(get())
-    }
+    // Provide Android-specific DatabaseDriverFactory (no-arg actual; uses process-wide appContext)
+    single<DatabaseDriverFactory> { DatabaseDriverFactory() }
 
     // Provide CoroutineScope for Android with proper error handling
     single<CoroutineScope> {
@@ -28,9 +27,10 @@ val androidModule = module {
 
     // Android-specific configuration for Reticulum
     factory {
+        val filesDir = appContext.filesDir
         AndroidReticulumConfig(
-            configDir = get<DatabaseDriverFactory>().getReticulumConfigDir().absolutePath,
-            identityDir = get<DatabaseDriverFactory>().getIdentityDir().absolutePath,
+            configDir = java.io.File(filesDir, ".reticulum").apply { mkdirs() }.absolutePath,
+            identityDir = java.io.File(filesDir, "shannon/identities").apply { mkdirs() }.absolutePath,
             enableNotifications = true,
             notificationTitle = "Shannon Network",
             notificationChannelId = "shannon_network_channel",
@@ -51,7 +51,7 @@ data class AndroidReticulumConfig(
     val notificationChannelId: String = "shannon_network_channel",
     val notificationChannelName: String = "Network Service",
     val notificationChannelDescription: String = "Shows network connection status",
-    val notificationIconResId: Int = R.drawable.ic_network_notification,
+    val notificationIconResId: Int = android.R.drawable.ic_dialog_info,
     val enableAutoReconnect: Boolean = true,
     val reconnectIntervalMs: Long = 5000,
     val healthCheckIntervalMs: Long = 30000

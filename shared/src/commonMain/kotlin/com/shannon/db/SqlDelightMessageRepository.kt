@@ -15,15 +15,22 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
+/**
+ * SQLDelight-backed [MessageRepository]. Holds the [ReticulumClient] (used for both sending
+ * outgoing messages and observing incoming packets), mirroring the constructor/`startListening`
+ * contract the integration tests expect.
+ */
 class SqlDelightMessageRepository(
     private val database: ShannonDatabase,
+    private val client: ReticulumClient,
     private val localHash: String,
     private val scope: CoroutineScope
 ) : MessageRepository {
 
     private var listenJob: Job? = null
 
-    fun startListening(client: ReticulumClient) {
+    /** Begin observing the client for incoming LXMF packets. Uses the constructor's [client]. */
+    fun startListening() {
         listenJob = scope.launch {
             client.observeIncomingPackets().collect { packet ->
                 val msg = Message(
@@ -83,7 +90,6 @@ class SqlDelightMessageRepository(
     }
 
     override suspend fun handleIncomingPacket(packet: LxmfPacket) {
-        // Create Message from incoming LxmfPacket
         val message = Message(
             destinationHash = packet.sourceHash,
             content = packet.content,
@@ -91,8 +97,6 @@ class SqlDelightMessageRepository(
             state = MessageState.SENT, // Incoming messages are already "sent" when received
             isOutgoing = false
         )
-
-        // Save with explicit source hash from packet
         saveMessageWithSource(message, sourceHash = packet.sourceHash)
     }
 
@@ -107,6 +111,10 @@ class SqlDelightMessageRepository(
         database.messageQueries.deleteById(id)
     }
 
+    /**
+     * Persist [message] and transmit it over Reticulum: QUEUED → SENDING → transmit → SENT,
+     * transitioning to FAILED (and persisting that state) if the network send throws.
+     */
     override suspend fun send(message: Message): Message {
         var current = message.transitionTo(MessageState.QUEUED)
         saveMessage(current)
@@ -114,11 +122,23 @@ class SqlDelightMessageRepository(
         current = current.transitionTo(MessageState.SENDING)
         updateMessage(current)
 
-        // TODO: This should be handled by a separate network service
-        // For now, just mark as sent
-        val sent = current.transitionTo(MessageState.SENT)
-        updateMessage(sent)
-        return sent
+        return try {
+            client.sendLxmfPacket(
+                LxmfPacket(
+                    destinationHash = message.destinationHash,
+                    sourceHash = localHash,
+                    content = message.content,
+                    timestamp = message.timestamp
+                )
+            )
+            val sent = current.transitionTo(MessageState.SENT)
+            updateMessage(sent)
+            sent
+        } catch (e: Exception) {
+            val failed = current.transitionTo(MessageState.FAILED)
+            updateMessage(failed)
+            failed
+        }
     }
 }
 

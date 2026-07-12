@@ -53,6 +53,12 @@ class ConnectivityViewModel(
         }
     }
 
+    /** Stop observing connection status (cancels the background collector). */
+    fun stopObserving() {
+        observeJob?.cancel()
+        observeJob = null
+    }
+
     /**
      * Save a new transport node configuration and trigger a network restart.
      */

@@ -18,4 +18,4 @@ dependencyResolutionManagement {
 
 include(":shared")
 include(":desktopApp")
-// include(":androidApp") // Temporarily disabled for build testing
+include(":androidApp")  // §2.1: re-enabled for Android Sherpa STT (was disabled "for build testing")

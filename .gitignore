@@ -71,6 +71,9 @@ logs/
 # OS
 .DS_Store
 Thumbs.db
+# Windows NTFS alternate-data-stream metadata (WSL /mnt/c mounts) + JVM heap dumps
+*:Zone.Identifier
+*.hprof
 
 # IDE
 .idea/

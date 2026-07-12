@@ -86,7 +86,7 @@ class ServiceHealthMonitor(
      */
     private fun isInDozeMode(): Boolean {
         val powerManager = context.getSystemService<PowerManager>()
-        return powerManager?.isIdleModeEnabled ?: false
+        return powerManager?.isDeviceIdleMode ?: false
     }
 
     /**
@@ -177,12 +177,12 @@ class ServiceHealthMonitor(
 
         return ServiceHealthSummary(
             duration = hours,
-            averageMemoryUsage = relevantMetrics.map { it.memoryUsagePercentage }.average(),
-            peakMemoryUsage = relevantMetrics.maxOfOrNull { it.memoryUsagePercentage } ?: 0.0,
-            minMemoryUsage = relevantMetrics.minOfOrNull { it.memoryUsagePercentage } ?: 0.0,
+            averageMemoryUsage = relevantMetrics.map { it.memoryUsagePercentage.toDouble() }.average(),
+            peakMemoryUsage = relevantMetrics.maxOfOrNull { it.memoryUsagePercentage.toDouble() } ?: 0.0,
+            minMemoryUsage = relevantMetrics.minOfOrNull { it.memoryUsagePercentage.toDouble() } ?: 0.0,
             totalRestarts = relevantMetrics.maxOfOrNull { it.serviceRestartCount } ?: 0,
             timeInDozeMode = relevantMetrics.count { it.isDeviceInDozeMode },
-            timeInPowerSaveMode = relevantMetrics.count { it.isInPowerSaveMode }
+            timeInPowerSaveMode = relevantMetrics.count { it.isPowerSaveMode }
         )
     }
 
@@ -200,7 +200,7 @@ class ServiceHealthMonitor(
                 writer.write("Timestamp: ${metric.timestamp}\n")
                 writer.write("Memory Usage: ${metric.memoryUsage} / ${metric.maxMemory} (${metric.memoryUsagePercentage}%)\n")
                 writer.write("Doze Mode: ${metric.isDeviceInDozeMode}\n")
-                writer.write("Power Save: ${metric.isInPowerSaveMode}\n")
+                writer.write("Power Save: ${metric.isPowerSaveMode}\n")
                 writer.write("Battery Optimizations Ignored: ${metric.isIgnoringBatteryOptimizations}\n")
                 writer.write("Service Restarts: ${metric.serviceRestartCount}\n")
                 writer.write("\n")

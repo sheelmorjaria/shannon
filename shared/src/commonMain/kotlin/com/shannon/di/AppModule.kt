@@ -27,7 +27,7 @@ val repositoryModule = module {
 }
 
 fun messageRepositoryModule(localHash: String) = module {
-    single<MessageRepository> { SqlDelightMessageRepository(get(), localHash, get()) }
+    single<MessageRepository> { SqlDelightMessageRepository(get(), get(), localHash, get()) }
 }
 
 val viewModelModule = module {

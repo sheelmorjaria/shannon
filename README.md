@@ -4,7 +4,7 @@
 
 **A Production-Grade, Decentralized Messenger Built on Reticulum Network**
 
-[![Kotlin](https://img.shields.io/badge/Kotlin-2.1.20-blue.svg)](https://kotlinlang.org)
+[![Kotlin](https://img.shields.io/badge/Kotlin-2.3.0-blue.svg)](https://kotlinlang.org)
 [![Compose Multiplatform](https://img.shields.io/badge/Compose-Multiplatform-1.7.3-2980b9.svg)](https://composemultiplatform.org/)
 [![SQLDelight](https://img.shields.io/badge/SQLDelight-2.0.2-orange.svg)](https://cashapp.github.io/SqlDelight/)
 [![Koin](https://img.shields.io/badge/Koin-3.5.6-purple.svg)](https://insert-koin.io/)
@@ -102,10 +102,15 @@ Shannon follows a clean, layered architecture with clear separation of concerns:
 
 ### Prerequisites
 
-- **JDK 21+**: For desktop development
-- **Android Studio**: For Android development
-- **Gradle 8.7+**: Build system
-- **Reticulum Network**: Access to a Reticulum transport node
+- **JDK 21+**: Required to run Gradle. Each module pins JDK 21 via the Gradle **toolchain**
+  (`jvmToolchain(21)`), so Gradle auto-detects/provisions it — no `org.gradle.java.home` needed.
+  The repo builds from both WSL and Windows (it lives on a shared `/mnt/c` drive).
+- **Android SDK** (only for `:androidApp`): provide via `ANDROID_HOME` (e.g. `~/Android/Sdk` on
+  WSL, or Android Studio's SDK on Windows). `local.properties` is kept OS-neutral (no `sdk.dir`).
+  Requires `platforms;android-36` + `build-tools;36.0.0` (the JitPack `rns-android` snapshot sets
+  `minCompileSdk=36`).
+- **Node.js / npm**: for the desktop React UI — see "Desktop App: React UI + Local Bridge" below.
+- **Reticulum Network**: Access to a Reticulum transport node.
 
 ### Building the Project
 
@@ -422,14 +427,27 @@ window close. For `npm run dev` (web-only development without the bridge), use M
 
 ## Live Captions & Translation (STT/TTS)
 
-On-device speech recognition via **Vosk** (`com.alphacephei:vosk`) — no cloud, no server.
-Each device transcribes its own microphone locally and sends only caption **text** to peers
-via the LXST `TRANSCRIPT` packet type. Raw audio never leaves the device.
+On-device speech recognition + synthesis via **Sherpa-ONNX** (`com.litongjava:sherpa-onnx-java-api`)
+— no cloud, no server. Each device transcribes its own microphone locally and sends only caption
+**text** to peers via the LXST `TRANSCRIPT` packet type (JSON `CaptionPayload`: `text` / `lang` /
+`final` / `seq`). Raw audio never leaves the device.
 
-- **STT**: VoskSpeechEngine (real recognition, replacing the stub). Built-in VAD via
-  `acceptWaveForm` utterance boundary detection. Graceful degradation when no model is present.
-- **Model download**: `VoskModelManager.ensureModel()` downloads the small English model
-  (~40 MB) from alphacephei.com on first use, cached at `~/.shannon/vosk/`.
-- **TTS**: stub (returns empty PCM; needs a separate engine like Piper/Sherpa for synthesis).
-- **Browser audio**: the React UI captures mic PCM via Web Audio API and streams it as binary
-  WebSocket frames to the bridge → `VoskSpeechEngine.feedPcm` → transcription.
+- **STT**: streaming Zipformer (`OnlineRecognizer`) for low-latency captions, with built-in VAD
+  via utterance/endpoint detection. **TTS**: Piper VITS (`OfflineTts`) for "Speak Translations".
+- **Desktop** (`desktopApp`): `SherpaSpeechEngine` + `SherpaModelManager` (downloads
+  Zipformer / Piper / Silero-VAD models on demand into `~/.shannon/sherpa/models/`) +
+  `SherpaNativeLoader` (downloads the platform `libsherpa-onnx-jni` / `libonnxruntime` native
+  libs on first run). Cataloged in `gradle/libs.versions.toml` as `sherpa-onnx-java-api`.
+- **Android** (`androidApp`): `SherpaSpeechEngine` mirrors the desktop engine but loads native
+  libs via `System.loadLibrary` from `jniLibs` and caches models under
+  `Context.getFilesDir()/sherpa/`. Compile- and assemble-verified (`:androidApp:assembleDebug`).
+  Runtime packaging TODO: drop `libsherpa-onnx-jni.so` + `libonnxruntime.so` (arm64-v8a / x86_64,
+  from the `sherpa-onnx-v*-android` release) into `androidApp/src/main/jniLibs/`, and add an
+  Android model downloader.
+- **Graceful degradation**: if native libs or models aren't available, `SpeechEngine.isAvailable`
+  is `false` and captions/TTS disable cleanly without affecting the call.
+- **Browser audio** (desktop): the React UI captures mic PCM via the Web Audio API and streams it
+  as binary WebSocket frames to the bridge → `SherpaSpeechEngine.feedPcm` → transcription.
+
+The engine is pluggable via a Koin `SpeechEngineProvider`; `captionModule()` binds a stub by
+default and each app overrides it with the real Sherpa engine.

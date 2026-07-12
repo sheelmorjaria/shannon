@@ -11,6 +11,7 @@ kotlinx-serialization = "1.7.3"
 androidx-activityCompose = "1.9.3"
 koin = "3.5.6"
 ktor = "3.0.3"
+sherpa-onnx = "1.0.1"  # com.litongjava:sherpa-onnx-java-api — k2fsa upstream has no Maven distribution
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -37,6 +38,10 @@ ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
 ktor-client-websockets = { module = "io.ktor:ktor-client-websockets", version.ref = "ktor" }
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
 koin-test = { module = "io.insert-koin:koin-test", version.ref = "koin" }
+# On-device STT + TTS + VAD (§6.1, add-live-translation-stt-tts). The k2fsa upstream has no standard
+# Maven distribution, so we use litongjava's repackaged Java API, which provides the com.k2fsa.sherpa.onnx.*
+# classes + native libs. Consumed by :desktopApp today; :androidApp will consume it when §2.1 unblocks.
+sherpa-onnx-java-api = { module = "com.litongjava:sherpa-onnx-java-api", version.ref = "sherpa-onnx" }
 
 [plugins]
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }

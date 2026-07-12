@@ -1,4 +1,5 @@
 plugins {
+    alias(libs.plugins.androidLibrary)
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.sqldelight)
@@ -7,7 +8,11 @@ plugins {
 }
 
 kotlin {
+    androidTarget()
     jvm("desktop")
+    // JDK 21 via toolchain: Gradle auto-detects/provisions it on any OS, so no
+    // org.gradle.java.home is needed (cross-platform WSL + Windows builds).
+    jvmToolchain(21)
 
     sourceSets {
         commonMain.dependencies {
@@ -33,6 +38,13 @@ kotlin {
             implementation(libs.sqldelight.jdbc.driver)
         }
 
+        val androidMain by getting {
+            dependencies {
+                implementation(libs.sqldelight.android.driver)
+                implementation("io.insert-koin:koin-android:3.5.6")
+            }
+        }
+
         val desktopMain by getting {
             dependencies {
                 implementation(libs.sqldelight.jdbc.driver)
@@ -51,7 +63,24 @@ kotlin {
     }
 }
 
-configurations.all {
+android {
+    namespace = "com.shannon.shared"
+    compileSdk = 36  // rns-android (JitPack reticulum-kt snapshot) requires minCompileSdk 36
+    defaultConfig {
+        minSdk = 26
+    }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
+    }
+    buildFeatures {
+        compose = true
+    }
+}
+
+// Keep Android-only artifacts (lifecycle/appcompat pulled transitively by koin-android)
+// off the desktop (JVM) classpath; the android target still gets its normal Android deps.
+configurations.matching { it.name.contains("desktop", ignoreCase = true) }.configureEach {
     exclude(group = "androidx.lifecycle", module = "lifecycle-runtime-ktx")
     exclude(group = "androidx.lifecycle", module = "lifecycle-livedata-core-ktx")
     exclude(group = "androidx.lifecycle", module = "lifecycle-service")
@@ -90,3 +119,15 @@ sqldelight {
 tasks.withType<Test> {
     useJUnitPlatform()
 }
+
+// commonTest uses desktop-only APIs (JdbcSqliteDriver, runDesktopComposeUiTest) and predates the
+// androidTarget — it only ever ran on the jvm("desktop") target. :shared exposes androidMain to
+// :androidApp (compileDebugKotlinAndroid), but its tests stay desktop-only (desktopTest/jvmTest,
+// which do NOT match "*UnitTest*"). Disable the Android unit-test variant for this module so
+// `gradlew test` doesn't try to compile commonTest for Android.
+tasks.matching { it.name.contains("UnitTest") }.configureEach { enabled = false }
+
+// KMP's `test` lifecycle task doesn't aggregate the jvm("desktop") target's `desktopTest` in this
+// setup, so `./gradlew test` previously skipped :shared's entire suite. Wire it so the root `test`
+// runs the desktop target tests.
+tasks.matching { it.name == "test" }.configureEach { dependsOn("desktopTest") }

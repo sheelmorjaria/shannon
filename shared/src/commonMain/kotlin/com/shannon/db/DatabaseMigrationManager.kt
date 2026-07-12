@@ -142,7 +142,10 @@ class DatabaseMigrationManager(private val database: ShannonDatabase) {
      */
     suspend fun verifyDatabaseIntegrity(): Boolean = withContext(Dispatchers.IO) {
         try {
-            // Test basic operations on each table
+            // Test basic operations on each table (exercises message, contact, config).
+            // Querying the message table is essential: a dropped/corrupted message table must be
+            // caught here (the other two queries don't touch it).
+            database.messageQueries.selectAllByContact("integrity_check", "integrity_check").executeAsList()
             database.contactQueries.selectAll().executeAsList()
             database.configQueries.selectByKey("test").executeAsList()
 

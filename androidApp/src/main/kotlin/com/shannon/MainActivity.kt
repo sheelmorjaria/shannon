@@ -33,7 +33,6 @@ import com.shannon.viewmodel.ConnectivityViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import org.koin.androidx.viewmodel.ext.android.viewModel
 
 /**
  * Main Activity for Shannon Android app.
@@ -41,7 +40,11 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
  */
 class MainActivity : ComponentActivity() {
 
-    private val connectivityViewModel: ConnectivityViewModel by viewModel()
+    // ConnectivityViewModel is a plain Koin definition (commonMain has no androidx viewModel DSL),
+    // so resolve it lazily from the global Koin context instead of `by viewModel()`.
+    private val connectivityViewModel: ConnectivityViewModel by lazy {
+        org.koin.core.context.GlobalContext.get().get()
+    }
     private val mainScope = CoroutineScope(Dispatchers.Main)
     private var serviceBound = false
     private var networkService: ShannonNetworkService? = null
@@ -363,14 +366,14 @@ fun ShannonApp(
     currentConversationHash: String? = null,
     pendingReply: Triple<String, String, Int>? = null
 ) {
-    val uiState by connectivityViewModel.uiState.collectAsState()
+    val uiState by connectivityViewModel.connectivityState.collectAsState()
 
     Scaffold(
         modifier = Modifier.fillMaxSize()
     ) { paddingValues ->
         ChatScreen(
             modifier = Modifier.padding(paddingValues),
-            connectionStatus = uiState.connectionStatus,
+            connectionStatus = uiState.statusText,
             currentConversationHash = currentConversationHash,
             pendingReply = pendingReply,
             onConnectClick = { /* TODO: Implement connect UI */ },

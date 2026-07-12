@@ -4,6 +4,11 @@ plugins {
     alias(libs.plugins.composeCompiler)
 }
 
+// JDK 21 via toolchain: Gradle auto-detects/provisions it on any OS — no org.gradle.java.home needed.
+kotlin {
+    jvmToolchain(21)
+}
+
 dependencies {
     implementation(project(":shared"))
     implementation(compose.desktop.currentOs)
@@ -29,10 +34,10 @@ dependencies {
     implementation("org.openjfx:javafx-web:21:$osClassifier")
     implementation("org.openjfx:javafx-media:21:$osClassifier")
     implementation("org.openjfx:javafx-swing:21:$osClassifier")
-    // Vosk on-device STT (§2.2): real speech recognition replacing the stub engine.
+    // On-device STT + TTS + VAD via Sherpa-ONNX (§2.2; the earlier Vosk tasks were replaced by Sherpa).
     // Model files are provided at runtime (downloaded separately to the modelPath).
-    // Sherpa-ONNX Java API (non-transitive — the artifact's POM pulls conflicting deps)
-    implementation("com.litongjava:sherpa-onnx-java-api:1.0.1") { isTransitive = false }
+    // Non-transitive — the artifact's POM pulls conflicting deps. Coordinate cataloged in §6.1.
+    implementation(libs.sherpa.onnx.java.api) { isTransitive = false }
 
     testImplementation(libs.kotlin.test)
     testImplementation(libs.kotlinx.coroutines.core)

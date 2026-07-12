@@ -24,8 +24,21 @@ a suggested implementation sequence.
       `sourceLang`, `targetLang`, `captionsEnabled`, `speakTranslations`.
 
 ## 2. Platform ML implementations
-- [ ] 2.1 `androidMain`: BLOCKED — needs Android SDK + AGP + Android target in shared KMP module (currently jvm("desktop") only). Code template: same SherpaSpeechEngine but with Sherpa AAR native libs + Android Context.getFilesDir() for model cache. Requires a machine with Android SDK to compile-verify.
-      AAR (STT + Silero VAD + TTS); model loading and lifecycle.
+- [x] 2.1 Android Sherpa STT/TTS engine. Implemented `androidApp/.../speech/SherpaSpeechEngine.kt`
+      (mirrors desktop: com.k2fsa.sherpa.onnx OnlineRecognizer + OfflineTts) + `AndroidSpeechEngineProvider`
+      (Context.getFilesDir()/sherpa model cache) + Koin override in ShannonApplication. Native libs load via
+      System.loadLibrary from jniLibs (NOT desktop's tar/System.load — Android can't shell out to tar or
+      System.load an arbitrary path). Required reviving the whole androidApp build, which had bit-rotted:
+      installed a Linux Android SDK (platforms;android-36, build-tools;36) + ANDROID_HOME; added an
+      androidTarget()/androidLibrary to :shared (androidMain was dead code — DatabaseDriverFactory rewritten
+      to match the no-arg commonMain `expect` via a process-wide `appContext`); aligned Kotlin 2.3.0/AGP and
+      declared all plugins at the root; compileSdk 36 (rns-android JitPack snapshot minCompileSdk); AndroidX;
+      launcher icon; and ~8 source-drift fixes (ConnectivityViewModel api, PowerManager.isDeviceIdleMode,
+      networkModule() signature, getSharedPreferences, etc.). **Compile- AND assemble-verified:
+      `:androidApp:assembleDebug` BUILD SUCCESSFUL → androidApp-debug.apk.**
+      Runtime TODOs (do not affect compilation): package libsherpa-onnx-jni.so + libonnxruntime.so (from the
+      sherpa-onnx-v*-android release) into androidApp/src/main/jniLibs/{arm64-v8a,x86_64}/; add an Android
+      model downloader (ZipInputStream, not tar) — §2.3 follow-up.
 - [x] 2.2 Desktop STT via **Vosk** (`com.alphacephei:vosk:0.3.45`) — `VoskSpeechEngine`
       in desktopApp (real STT, not stub). Sherpa-ONNX replaced by Vosk as the design-allowed
       fallback (Sherpa-ONNX has no standard Maven distribution).
@@ -64,8 +77,14 @@ a suggested implementation sequence.
 - [x] 5.4 Visual state for `isAvailable == false` (model download prompt / disabled).
 
 ## 6. Build, DI, and tests
-- [ ] 6.1 Add `com.k2fsa.sherpa-onnx` to `gradle/libs.versions.toml` (android +
-      desktop source sets).
+- [x] 6.1 Catalog the Sherpa-ONNX dependency in `gradle/libs.versions.toml`. The
+      spec/proposal name `com.k2fsa.sherpa-onnx` has **no standard Maven distribution**,
+      so the real artifact is `com.litongjava:sherpa-onnx-java-api:1.0.1` (it provides the
+      `com.k2fsa.sherpa.onnx.*` package + native libs). Added version `sherpa-onnx = "1.0.1"`
+      + library `sherpa-onnx-java-api`; `:desktopApp` now uses `libs.sherpa.onnx.java.api`
+      (non-transitive) instead of the hardcoded coordinate. `:androidApp` will consume it
+      when §2.1 unblocks. Compile-verified on desktop. *(Spec drift: update `com.k2fsa.sherpa-onnx`
+      → `com.litongjava:sherpa-onnx-java-api` in proposal/design/spec D2.)*
 - [x] 6.2 Add a Koin `captionModule` in `AppModule.kt` (`SpeechEngine`,
       `CaptionRepository`); wire optional deps like the existing `voiceCallModule`.
 - [x] 6.3 Unit tests: `CaptionPayload` (de)serialization, `TRANSCRIPT` packet
